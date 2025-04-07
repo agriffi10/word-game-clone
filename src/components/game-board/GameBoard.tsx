@@ -5,17 +5,8 @@ type GameBoardProps = {
   board: Board;
 };
 export default function GameBoard({ board }: GameBoardProps) {
-  // [
-  //   ["a", "a", "a", "a", "a", "a"],
-  //   ["a", "a", "a", "a", "a", "a"],
-  //   ["a", "a", "a", "a", "a", "a"],
-  //   ["a", "a", "a", "a", "a", "a"],
-  //   ["a", "a", "a", "a", "a", "a"],
-  //   ["a", "a", "a", "a", "a", "a"],
-  // ];
-
   return (
-    <div className="mx-auto flex w-full max-w-[800px] flex-wrap">
+    <div className="mx-auto flex w-full max-w-[500px] flex-wrap">
       {board.map((boardRow, arrIndex) => (
         <div
           key={arrIndex}
