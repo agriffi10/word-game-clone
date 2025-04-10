@@ -63,7 +63,7 @@ export default function VirtualKeyboard({
             <button
               key={keyObj.key}
               type="button"
-              className={`mx-1 my-1 h-10 w-10 rounded-md bg-gray-200 text-gray-900 transition-colors duration-700 ${keyObj.style}`}
+              className={`mx-1 my-1 h-10 w-10 transform cursor-pointer rounded-md border-white bg-gray-200 text-gray-900 shadow-lg transition-transform outline-none focus:ring-4 active:scale-x-75 ${keyObj.style}`}
               onClick={() => keyboardClick(keyObj)}>
               {keyObj.key.toUpperCase()}
             </button>

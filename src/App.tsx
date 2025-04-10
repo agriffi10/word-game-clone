@@ -3,14 +3,16 @@ import "./App.css";
 import GameBoard from "./components/game-board/GameBoard";
 import VirtualKeyboard from "./components/virtual-keyboard/VirtualKeyboard";
 import { MAX_ROW_INDEX } from "./utils/GameBoardHelpers";
+
 import { KeyObjBase } from "./typing/components/KeyboardTypes";
+import Modal from "./components/modal/Modal";
 
 function App() {
   const currentWord = "apples";
   const [hasFinished, setHasFinished] = useState(false);
   const [currentRow, setCurrentRow] = useState(0);
   const [currentGuess, setCurrentGuess] = useState<KeyObjBase[]>([]);
-
+  const [hasWon, setHasWon] = useState(false);
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
   };
@@ -66,15 +68,30 @@ function App() {
     }
   }, [currentRow]);
 
+  const getGameOverText = () => {
+    if (hasWon) {
+      return "You won!";
+    }
+    return `Not this time!`;
+  };
+
+  const resetGame = () => {
+    setCurrentRow(0);
+    setCurrentGuess(() => []);
+    setHasFinished(false);
+    setHasWon(false);
+  };
+
   return (
     <div className="letter-columns flex h-screen w-screen items-center justify-center p-5 text-center">
       <main className="mx-auto w-full max-w-[800px]">
-        <div className="min-w-[300px] rounded-lg bg-gray-800 p-5 shadow-lg">
+        <div className="mx-auto w-full max-w-[600px] rounded-lg bg-gray-800 p-5 shadow-lg">
           <GameBoard
             currentRowIdx={currentRow}
             currentGuess={currentGuess}
             currentWord={currentWord}
             resetGuess={resetGuess}
+            hasFinished={hasFinished}
           />
           <VirtualKeyboard
             enterGuess={enterGuess}
@@ -84,6 +101,23 @@ function App() {
             currentGuess={currentGuess}
           />
         </div>
+        <Modal show={hasFinished}>
+          <div>
+            <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
+            <h3 className="mb-3 text-2xl">The word was {currentWord.toUpperCase()}</h3>
+            <p>
+              You took {currentRow} guess{currentRow > 1 ? "es" : ""}
+            </p>
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                className="mx-2 w-32 rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
+                onClick={() => resetGame()}>
+                Reset Game
+              </button>
+            </div>
+          </div>
+        </Modal>
       </main>
     </div>
   );
