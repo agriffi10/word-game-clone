@@ -8,8 +8,7 @@ export type KeyObjBase = {
   key: string;
   style: string;
   type: KeyType;
-  rowIdx?: number;
-  keyIdx?: number;
+  location: number[];
 };
 
 export type KeyRow = Array<KeyObjBase>;
@@ -17,8 +16,8 @@ export type Keyboard = KeyRow[];
 
 export type VirtualKeyboardProps = {
   currentWord: string;
-  enterLetter: (letter: string) => void;
+  enterLetter: (letter: KeyObjBase) => void;
   deleteLetter: () => void;
   enterGuess: () => void;
-  rowIdx: number;
+  currentGuess: KeyObjBase[];
 };

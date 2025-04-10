@@ -1,7 +1,5 @@
-export type LetterBox = {
-  letter: string
-}
+import { LetterBoxBaseType } from "./GameBoardTypes";
 
-export interface LetterBoxBaseProps extends LetterBox {
-  classes: string
-}
+export type LetterBoxBaseProps = {
+  letter: LetterBoxBaseType;
+};

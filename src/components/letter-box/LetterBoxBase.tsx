@@ -1,9 +1,12 @@
 import { LetterBoxBaseProps } from "../../typing/components/LetterBoxTypes";
 
-export default function LetterBoxBase({ letter = "", classes }: LetterBoxBaseProps) {
+export default function LetterBoxBase({ letter }: LetterBoxBaseProps) {
   return (
-    <div className={`mx-1 aspect-square flex-auto bg-gray-600 p-3 ${classes.trim()}`}>
-      <span className="text-white">{letter.toUpperCase()}</span>
+    <div
+      className={`relative mx-1 aspect-square flex-auto p-3 transition-colors duration-700 ${letter.style}`}>
+      <div className="absolute top-0.5 right-0.5 bottom-0.5 left-0.5 text-white">
+        <span className="text-[45px]">{letter.key.toUpperCase()}</span>
+      </div>
     </div>
   );
 }

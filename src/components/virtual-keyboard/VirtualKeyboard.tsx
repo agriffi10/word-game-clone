@@ -1,133 +1,70 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   VirtualKeyboardProps,
   Keyboard,
   KeyType,
   KeyObjBase,
 } from "../../typing/components/KeyboardTypes";
+import { DEFAULT_KEYBOARD } from "../../utils/KeyboardHelpers";
+import { determineLetterStyle } from "../../utils/GameHelpers";
 
 export default function VirtualKeyboard({
   enterLetter,
   deleteLetter,
   enterGuess,
   currentWord,
-  rowIdx,
+  currentGuess,
 }: VirtualKeyboardProps) {
-  const defaultKeyboard: Keyboard = [
-    [
-      { key: "q", style: "", type: KeyType.LETTER },
-      { key: "w", style: "", type: KeyType.LETTER },
-      { key: "e", style: "", type: KeyType.LETTER },
-      { key: "r", style: "", type: KeyType.LETTER },
-      { key: "t", style: "", type: KeyType.LETTER },
-      { key: "y", style: "", type: KeyType.LETTER },
-      { key: "u", style: "", type: KeyType.LETTER },
-      { key: "i", style: "", type: KeyType.LETTER },
-      { key: "o", style: "", type: KeyType.LETTER },
-      { key: "p", style: "", type: KeyType.LETTER },
-    ],
-    [
-      { key: "a", style: "", type: KeyType.LETTER },
-      { key: "s", style: "", type: KeyType.LETTER },
-      { key: "d", style: "", type: KeyType.LETTER },
-      { key: "f", style: "", type: KeyType.LETTER },
-      { key: "g", style: "", type: KeyType.LETTER },
-      { key: "h", style: "", type: KeyType.LETTER },
-      { key: "j", style: "", type: KeyType.LETTER },
-      { key: "k", style: "", type: KeyType.LETTER },
-      { key: "l", style: "", type: KeyType.LETTER },
-    ],
-    [
-      { key: "del", style: "w-12 bg-red-400 text-white", type: KeyType.DELETE },
-      { key: "z", style: "", type: KeyType.LETTER },
-      { key: "x", style: "", type: KeyType.LETTER },
-      { key: "c", style: "", type: KeyType.LETTER },
-      { key: "v", style: "", type: KeyType.LETTER },
-      { key: "b", style: "", type: KeyType.LETTER },
-      { key: "n", style: "", type: KeyType.LETTER },
-      { key: "m", style: "", type: KeyType.LETTER },
-      { key: "enter", style: "w-16 bg-sky-400", type: KeyType.ENTER },
-    ],
-  ];
-  const [currentGuess, setCurrentGuess] = useState<KeyObjBase[]>([]);
-  const [keyboard, setKeyBoard] = useState<Keyboard>(defaultKeyboard);
+  const [keyboard, setKeyBoard] = useState<Keyboard>(DEFAULT_KEYBOARD);
 
-  const setLetterOnBoard = (newData: Keyboard, letterObj: KeyObjBase) => {
-    console.log("Setting letter", letterObj.key);
-    const currentRow = letterObj.rowIdx ?? 0;
-    const currentLetter = letterObj.keyIdx ?? 0;
-    return newData.map((row, rIndex) => {
-      if (rIndex == currentRow) {
-        return row.map((col, cIndex) => {
-          if (cIndex == currentLetter) {
-            return { ...col, style: letterObj.style };
-          }
-          return col;
-        });
-      }
-      return row;
-    });
-  };
-  const checkLetter = (keyPressed: KeyObjBase) => {
-    console.log(keyPressed.key);
-    enterLetter(keyPressed.key);
-    setCurrentGuess((prev: KeyObjBase[]) => [...prev, keyPressed]);
-  };
-
-  const removeLetter = () => {
-    deleteLetter();
-    setCurrentGuess((prev: LetterKey[]) => prev.slice(0, -1));
+  const setLetterOnBoard = (coordinates: KeyObjBase[]): Keyboard => {
+    const newKeyboard = [...keyboard];
+    for (let i = 0; i < coordinates.length; i++) {
+      const letterObj = coordinates[i];
+      const rowIdx = letterObj.location[0];
+      const keyIdx = letterObj.location[1];
+      const style = letterObj.style;
+      newKeyboard[rowIdx][keyIdx].style = style;
+    }
+    return newKeyboard;
   };
 
   const checkWord = () => {
     if (currentGuess.length !== currentWord.length) {
-      console.log("not enough letters");
       return;
     }
-    enterGuess();
-    let newKeyboard = [...keyboard];
+    const coordinates: KeyObjBase[] = [];
     for (let i = 0; i < currentGuess.length; i++) {
       const letterObj = currentGuess[i];
       const letter = letterObj.key;
-      if (currentWord.includes(letter)) {
-        if (currentWord[i] == letter) {
-          letterObj.style = "bg-green-500";
-        } else {
-          letterObj.style = "bg-yellow-500";
-        }
-      } else {
-        letterObj.style = "bg-gray-500";
-      }
-      newKeyboard = setLetterOnBoard(newKeyboard, letterObj);
+      letterObj.style = determineLetterStyle(currentWord, letter, i, letterObj.style);
+      coordinates.push(letterObj);
     }
-    setKeyBoard(newKeyboard);
+    const newKeyboard = setLetterOnBoard(coordinates);
+    setKeyBoard(() => newKeyboard);
+    enterGuess();
   };
 
-  const keyboardClick = (keyObj: KeyObjBase, rowIdx: number, keyIdx: number) => {
+  const keyboardClick = (keyObj: KeyObjBase) => {
     if (keyObj.type === KeyType.LETTER) {
-      checkLetter({ ...keyObj, rowIdx, keyIdx });
+      enterLetter(keyObj);
     } else if (keyObj.type === KeyType.DELETE) {
-      removeLetter();
+      deleteLetter();
     } else if (keyObj.type === KeyType.ENTER) {
       checkWord();
     }
   };
 
-  useMemo(() => {
-    setCurrentGuess([]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rowIdx]);
-
   return (
     <div>
       {keyboard.map((keyboardRow, rowIdx) => (
         <div key={rowIdx}>
-          {keyboardRow.map((keyObj, keyIdx) => (
+          {keyboardRow.map((keyObj) => (
             <button
               key={keyObj.key}
               type="button"
-              className={`mx-1 my-1 h-10 w-10 rounded-md bg-gray-200 text-gray-900 ${keyObj.style}`}
-              onClick={() => keyboardClick(keyObj, rowIdx, keyIdx)}>
+              className={`mx-1 my-1 h-10 w-10 rounded-md bg-gray-200 text-gray-900 transition-colors duration-700 ${keyObj.style}`}
+              onClick={() => keyboardClick(keyObj)}>
               {keyObj.key.toUpperCase()}
             </button>
           ))}
