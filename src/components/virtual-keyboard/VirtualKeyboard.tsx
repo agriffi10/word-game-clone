@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   VirtualKeyboardProps,
   Keyboard,
   KeyType,
   KeyObjBase,
 } from "../../typing/components/KeyboardTypes";
-import { DEFAULT_KEYBOARD } from "../../utils/KeyboardHelpers";
+import { getDefaultKeyboard } from "../../utils/KeyboardHelpers";
 import { determineLetterStyle } from "../../utils/GameHelpers";
 
 export default function VirtualKeyboard({
@@ -15,7 +15,7 @@ export default function VirtualKeyboard({
   currentWord,
   currentGuess,
 }: VirtualKeyboardProps) {
-  const [keyboard, setKeyBoard] = useState<Keyboard>(DEFAULT_KEYBOARD);
+  const [keyboard, setKeyBoard] = useState<Keyboard>(getDefaultKeyboard());
 
   const setLetterOnBoard = (coordinates: KeyObjBase[]): Keyboard => {
     const newKeyboard = [...keyboard];
@@ -54,6 +54,10 @@ export default function VirtualKeyboard({
       checkWord();
     }
   };
+
+  useEffect(() => {
+    setKeyBoard(() => getDefaultKeyboard());
+  }, [currentWord]);
 
   return (
     <div>

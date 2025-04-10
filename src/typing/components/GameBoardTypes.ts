@@ -14,4 +14,5 @@ export type GameBoardProps = {
   currentGuess: KeyObjBase[];
   currentWord: string;
   resetGuess: () => void;
+  endTheGame: () => void;
 };

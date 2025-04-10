@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 import GameBoard from "./components/game-board/GameBoard";
 import VirtualKeyboard from "./components/virtual-keyboard/VirtualKeyboard";
-import { MAX_ROW_INDEX } from "./utils/GameBoardHelpers";
 
 import { KeyObjBase } from "./typing/components/KeyboardTypes";
 import Modal from "./components/modal/Modal";
 
 function App() {
-  const currentWord = "apples";
   const [hasFinished, setHasFinished] = useState(false);
   const [currentRow, setCurrentRow] = useState(0);
   const [currentGuess, setCurrentGuess] = useState<KeyObjBase[]>([]);
-  const [hasWon, setHasWon] = useState(false);
+  const [currentWord, setCurrentWord] = useState<string>("apples");
+
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
+  };
+
+  const hasWon = () => {
+    return getCurrentGuessWord() == currentWord;
   };
 
   const enterLetter = (letter: KeyObjBase) => {
@@ -35,7 +38,6 @@ function App() {
   };
 
   const enterGuess = () => {
-    const guessWord = getCurrentGuessWord();
     if (hasFinished) {
       return;
     }
@@ -43,9 +45,6 @@ function App() {
     if (!isValid) {
       console.log("Guess word is not valid");
       return;
-    }
-    if (guessWord == currentWord) {
-      setHasFinished(true);
     }
     setCurrentRow((prev) => prev + 1);
   };
@@ -62,14 +61,12 @@ function App() {
     setCurrentGuess(() => []);
   };
 
-  useEffect(() => {
-    if (currentRow > MAX_ROW_INDEX) {
-      setHasFinished(true);
-    }
-  }, [currentRow]);
+  const endTheGame = () => {
+    setHasFinished(true);
+  };
 
   const getGameOverText = () => {
-    if (hasWon) {
+    if (hasWon()) {
       return "You won!";
     }
     return `Not this time!`;
@@ -79,27 +76,29 @@ function App() {
     setCurrentRow(0);
     setCurrentGuess(() => []);
     setHasFinished(false);
-    setHasWon(false);
+    setCurrentWord("popcor");
   };
 
   return (
     <div className="letter-columns flex h-screen w-screen items-center justify-center p-5 text-center">
       <main className="mx-auto w-full max-w-[800px]">
         <div className="mx-auto w-full max-w-[600px] rounded-lg bg-gray-800 p-5 shadow-lg">
-          <GameBoard
-            currentRowIdx={currentRow}
-            currentGuess={currentGuess}
-            currentWord={currentWord}
-            resetGuess={resetGuess}
-            hasFinished={hasFinished}
-          />
-          <VirtualKeyboard
-            enterGuess={enterGuess}
-            enterLetter={enterLetter}
-            deleteLetter={deleteLetter}
-            currentWord={currentWord}
-            currentGuess={currentGuess}
-          />
+          <>
+            <GameBoard
+              currentRowIdx={currentRow}
+              currentGuess={currentGuess}
+              currentWord={currentWord}
+              resetGuess={resetGuess}
+              endTheGame={endTheGame}
+            />
+            <VirtualKeyboard
+              enterGuess={enterGuess}
+              enterLetter={enterLetter}
+              deleteLetter={deleteLetter}
+              currentWord={currentWord}
+              currentGuess={currentGuess}
+            />
+          </>
         </div>
         <Modal show={hasFinished}>
           <div>

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Board, GameBoardProps, LetterBoxBaseType } from "../../typing/components/GameBoardTypes";
-import { DEFAULT_GAME_BOARD, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
+import { getNewGameBoard, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
 import { GameStyles } from "../../typing/enums/GameStyles";
 import LetterBoxBase from "../letter-box/LetterBoxBase";
 import { determineLetterStyle } from "../../utils/GameHelpers";
@@ -11,8 +11,9 @@ export default function GameBoard({
   currentGuess,
   currentWord,
   resetGuess,
+  endTheGame,
 }: GameBoardProps) {
-  const [board, setBoard] = useState<Board>(DEFAULT_GAME_BOARD);
+  const [board, setBoard] = useState<Board>(getNewGameBoard());
   const [currentLetterIdx, setCurrentLetterIdx] = useState(0);
 
   const setLetterOnBoard = () => {
@@ -59,7 +60,14 @@ export default function GameBoard({
     }
     const newKeyboard = getUpdatedBoard(coordinates);
     setBoard(() => newKeyboard);
-    resetGuess();
+    if (
+      currentRowIdx > MAX_LETTER_INDEX ||
+      currentGuess.map((x) => x.key).join("") == currentWord
+    ) {
+      endTheGame();
+    } else {
+      resetGuess();
+    }
   };
 
   useEffect(() => {
@@ -76,6 +84,10 @@ export default function GameBoard({
     }
     updateBoard();
   }, [currentRowIdx]);
+
+  useEffect(() => {
+    setBoard(() => getNewGameBoard());
+  }, [currentWord]);
 
   return (
     <div className="mx-auto flex w-full max-w-[500px] flex-wrap">
