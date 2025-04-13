@@ -80,6 +80,10 @@ function App() {
 
   const endTheGame = () => {
     setHasFinished(true);
+    const newWord = { ...currentWord };
+    newWord.isSolved = true;
+    newWord.currentWord = false;
+    updateWordInMemory(null, newWord);
   };
 
   const getGameOverText = () => {
@@ -91,11 +95,16 @@ function App() {
 
   const resetGame = () => {
     setCurrentRow(0);
-    setCurrentGuess(() => []);
+    resetGuess();
     setHasFinished(false);
-    // setCurrentWord(() => "");
+    getNewWord();
   };
 
+  /**
+   * Description placeholder
+   *
+   * @param {(WordData[] | null)} [data=null]
+   */
   const getNewWord = (data: WordData[] | null = null) => {
     if (!data) {
       data = wordsList;
