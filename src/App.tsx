@@ -6,18 +6,14 @@ import VirtualKeyboard from "./components/virtual-keyboard/VirtualKeyboard";
 
 import { KeyObjBase } from "./typing/components/KeyboardTypes";
 import Modal from "./components/modal/Modal";
-
-type WordData = {
-  word: string;
-  isSolved: boolean;
-  guesses: string[];
-  currentWord: boolean;
-};
+import { Guess, WordData } from "./typing/components/AppTypes";
+import { GameViewState } from "./typing/enums/ViewStates";
+import PreviousBoard from "./components/previous/previous-board/PreviousBoard";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
   const [currentRow, setCurrentRow] = useState(0);
-  const [currentGuess, setCurrentGuess] = useState<KeyObjBase[]>([]);
+  const [currentGuess, setCurrentGuess] = useState<Guess>([]);
   const [currentWord, setCurrentWord] = useState<WordData>({
     word: "",
     isSolved: false,
@@ -25,7 +21,8 @@ function App() {
     currentWord: false,
   });
   const [wordsList, setWordsList] = useState<WordData[]>([]);
-
+  const [viewState, setViewState] = useState<GameViewState>(GameViewState.GAME);
+  const [showModal, setShowModal] = useState(false);
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
   };
@@ -84,6 +81,7 @@ function App() {
     newWord.isSolved = true;
     newWord.currentWord = false;
     updateWordInMemory(null, newWord);
+    toggleModal();
   };
 
   const getGameOverText = () => {
@@ -98,6 +96,10 @@ function App() {
     resetGuess();
     setHasFinished(false);
     getNewWord();
+  };
+
+  const toggleModal = () => {
+    setShowModal((prev) => !prev);
   };
 
   /**
@@ -140,6 +142,18 @@ function App() {
     setWordsList(() => newWordsList);
   };
 
+  const updateViewState = (state: GameViewState) => {
+    setViewState(() => state);
+  };
+
+  const getGameBoardStyle = () => {
+    return viewState == GameViewState.GAME ? "" : "move-right";
+  };
+
+  const getPreviousBoardStyle = () => {
+    return viewState == GameViewState.PREVIOUS ? "" : "move-left";
+  };
+
   useEffect(() => {
     const words = localStorage.getItem("words");
     if (words) {
@@ -161,31 +175,57 @@ function App() {
   return (
     <div className="letter-columns flex h-screen w-screen items-center justify-center p-5 text-center">
       <main className="mx-auto w-full max-w-[800px]">
-        <div className="mx-auto w-full max-w-[600px] rounded-lg bg-gray-800 p-5 shadow-lg">
-          <>
-            <GameBoard
-              currentRowIdx={currentRow}
-              currentGuess={currentGuess}
-              currentWord={currentWord.word}
-              resetGuess={resetGuess}
-              endTheGame={endTheGame}
-            />
-            <VirtualKeyboard
-              enterGuess={enterGuess}
-              enterLetter={enterLetter}
-              deleteLetter={deleteLetter}
-              currentWord={currentWord.word}
-              currentGuess={currentGuess}
-            />
+        <div className="mx-auto w-full max-w-[600px] overflow-hidden rounded-lg bg-gray-800 p-5 shadow-lg">
+          <div className="stage">
+            <div className={`scene ${getGameBoardStyle()}`}>
+              <GameBoard
+                currentRowIdx={currentRow}
+                currentGuess={currentGuess}
+                currentWord={currentWord.word}
+                resetGuess={resetGuess}
+                endTheGame={endTheGame}
+              />
+              <VirtualKeyboard
+                enterGuess={enterGuess}
+                enterLetter={enterLetter}
+                deleteLetter={deleteLetter}
+                currentWord={currentWord.word}
+                currentGuess={currentGuess}
+              />
+              <button
+                type="button"
+                className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
+                onClick={() => updateViewState(GameViewState.PREVIOUS)}>
+                View Finished Words
+              </button>
+            </div>
+            <div className={`scene ${getPreviousBoardStyle()}`}>
+              <h2 className="mb-3 text-3xl">Previous Words</h2>
+              <PreviousBoard wordList={wordsList} />
+              <button
+                type="button"
+                className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
+                onClick={() => updateViewState(GameViewState.GAME)}>
+                Back to game
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
+            onClick={() => clearWordCache()}>
+            Clear Word Cache
+          </button>
+          {hasFinished && (
             <button
               type="button"
               className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-              onClick={() => clearWordCache()}>
-              Clear Word Cache
+              onClick={() => resetGame()}>
+              Play Again
             </button>
-          </>
+          )}
         </div>
-        <Modal show={hasFinished}>
+        <Modal show={showModal}>
           <div>
             <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
             <h3 className="mb-3 text-2xl">The word was {currentWord.word.toUpperCase()}</h3>
@@ -196,8 +236,8 @@ function App() {
               <button
                 type="button"
                 className="mx-2 w-32 rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-                onClick={() => resetGame()}>
-                Reset Game
+                onClick={() => toggleModal()}>
+                close
               </button>
             </div>
           </div>

@@ -15,3 +15,28 @@ main {
   opacity: 1;
   background: repeating-linear-gradient( 45deg, #ffffff, #ffffff 20px, #44444a 20px, #44444a 100px );
 }
+
+.stage {
+  position: relative;
+}
+
+.scene {
+  transition: .5s ease;
+}
+
+.scene.move-right,
+.scene.move-left {
+  position: absolute;
+  visibility: hidden;
+  user-select: none;
+  height:0;
+  overflow: hidden;
+}
+.scene.move-right {
+  transform: translateX(-1000%);
+
+}
+.scene.move-left {
+  transform: translateX(1000%);
+}
+
