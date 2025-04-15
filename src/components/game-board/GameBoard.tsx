@@ -17,11 +17,12 @@ export default function GameBoard({
   const [currentLetterIdx, setCurrentLetterIdx] = useState(0);
 
   const setLetterOnBoard = () => {
+    const defaultStyle = "bg-gray-300"
     const newBoard = [...board];
     for (let i = 0; i < currentGuess.length; i++) {
       const currentLetterBox = {
         key: currentGuess[i].key,
-        style: GameStyles.NOT_IN_WORD,
+        style: defaultStyle,
         location: [currentRowIdx, i],
       };
       newBoard[currentRowIdx][i] = currentLetterBox;
@@ -30,7 +31,7 @@ export default function GameBoard({
     for (let i = currentGuess.length; i < MAX_LETTER_INDEX + 1; i++) {
       const currentLetterBox = {
         key: "",
-        style: GameStyles.NOT_IN_WORD,
+        style: defaultStyle,
         location: [currentRowIdx, i],
       };
       newBoard[currentRowIdx][i] = currentLetterBox;
@@ -94,7 +95,7 @@ export default function GameBoard({
       {board.map((boardRow, arrIndex) => (
         <div
           key={arrIndex}
-          className="my-1 flex w-full justify-around">
+          className="my-1 flex w-full mb-2 justify-around">
           {boardRow.map((letter, letterIdx) => (
             <LetterBoxBase
               key={arrIndex.toString() + letterIdx}

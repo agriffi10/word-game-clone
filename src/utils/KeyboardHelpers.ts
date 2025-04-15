@@ -26,7 +26,7 @@ export const getDefaultKeyboard = (): Keyboard => {
       { key: "l", style: "", type: KeyType.LETTER, location: [1, 8] },
     ],
     [
-      { key: "del", style: "w-12 bg-secondary text-white", type: KeyType.DELETE, location: [2, 0] },
+      { key: "delete", style: "w-16 bg-secondary text-white", type: KeyType.DELETE, location: [2, 0] },
       { key: "z", style: "", type: KeyType.LETTER, location: [2, 1] },
       { key: "x", style: "", type: KeyType.LETTER, location: [2, 2] },
       { key: "c", style: "", type: KeyType.LETTER, location: [2, 3] },

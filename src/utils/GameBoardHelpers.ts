@@ -1,10 +1,9 @@
 import { Board, LetterBoxBaseType } from "../typing/components/GameBoardTypes";
-import { GameStyles } from "../typing/enums/GameStyles";
 
 const getDefaultLetterBox = (row: number, col: number): LetterBoxBaseType => {
   return {
     key: "",
-    style: GameStyles.NOT_IN_WORD,
+    style: "bg-gray-300",
     location: [row, col],
   };
 };

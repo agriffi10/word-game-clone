@@ -174,9 +174,9 @@ function App() {
   }, []);
 
   return (
-    <div className="bg-accent flex h-screen w-screen items-center justify-center p-5 text-center">
+    <div className="bg-accent flex h-screen w-screen items-center justify-center p-2 sm:p-5 text-center">
       <main className="mx-auto w-full max-w-[800px]">
-        <div className="bg-primary shadow-thick mx-auto w-full max-w-[600px] overflow-hidden rounded-lg p-5">
+        <div className="bg-primary shadow-thick mx-auto w-full max-w-[600px] overflow-hidden rounded-lg p-2 md:p-5">
           <div className="stage">
             <div className={`scene ${getGameBoardStyle()}`}>
               <div className="w-full text-right">
