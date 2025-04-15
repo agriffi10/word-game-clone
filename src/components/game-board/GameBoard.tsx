@@ -90,7 +90,7 @@ export default function GameBoard({
   }, [currentWord]);
 
   return (
-    <div className="mx-auto flex w-full max-w-[500px] flex-wrap">
+    <div className="mx-auto flex w-full flex-wrap">
       {board.map((boardRow, arrIndex) => (
         <div
           key={arrIndex}

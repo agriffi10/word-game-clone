@@ -9,6 +9,7 @@ import Modal from "./components/modal/Modal";
 import { Guess, WordData } from "./typing/components/AppTypes";
 import { GameViewState } from "./typing/enums/ViewStates";
 import PreviousBoard from "./components/previous/previous-board/PreviousBoard";
+import LinkButton from "./components/buttons/LinkButton";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -173,11 +174,18 @@ function App() {
   }, []);
 
   return (
-    <div className="letter-columns flex h-screen w-screen items-center justify-center p-5 text-center">
+    <div className="bg-accent flex h-screen w-screen items-center justify-center p-5 text-center">
       <main className="mx-auto w-full max-w-[800px]">
-        <div className="mx-auto w-full max-w-[600px] overflow-hidden rounded-lg bg-gray-800 p-5 shadow-lg">
+        <div className="bg-primary shadow-thick mx-auto w-full max-w-[600px] overflow-hidden rounded-lg p-5">
           <div className="stage">
             <div className={`scene ${getGameBoardStyle()}`}>
+              <div className="w-full text-right">
+                <LinkButton
+                  viewState={GameViewState.PREVIOUS}
+                  callback={updateViewState}>
+                  View Finished Words
+                </LinkButton>
+              </div>
               <GameBoard
                 currentRowIdx={currentRow}
                 currentGuess={currentGuess}
@@ -192,22 +200,17 @@ function App() {
                 currentWord={currentWord.word}
                 currentGuess={currentGuess}
               />
-              <button
-                type="button"
-                className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-                onClick={() => updateViewState(GameViewState.PREVIOUS)}>
-                View Finished Words
-              </button>
             </div>
             <div className={`scene ${getPreviousBoardStyle()}`}>
+              <div className="w-full text-left">
+                <LinkButton
+                  viewState={GameViewState.GAME}
+                  callback={updateViewState}>
+                  Back To Game
+                </LinkButton>
+              </div>
               <h2 className="mb-3 text-3xl">Previous Words</h2>
               <PreviousBoard wordList={wordsList} />
-              <button
-                type="button"
-                className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-                onClick={() => updateViewState(GameViewState.GAME)}>
-                Back to game
-              </button>
             </div>
           </div>
           <button

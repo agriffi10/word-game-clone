@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: #845ec2;
+  --color-secondary: #ff6f91;
+  --color-tertiary: #008f7a;
+  --color-accent: #008e9b;
+  --color-invalid: #b0a8b9;
+  --color-found: #f9f871;
+  --color-correct: #00c9a7;
+  --shadow-thick: 5px 5px 1px 1px black;
+}
+
 main {
   display: flex;
   flex-direction: column;
@@ -10,11 +21,7 @@ main {
   max-width: 800px;
   margin: auto;
 }
-.letter-columns {
-  background-color: #44444a;
-  opacity: 1;
-  background: repeating-linear-gradient( 45deg, #ffffff, #ffffff 20px, #44444a 20px, #44444a 100px );
-}
+
 
 .stage {
   position: relative;
