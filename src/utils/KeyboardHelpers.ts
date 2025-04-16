@@ -1,52 +1,54 @@
-import { Keyboard, KeyType } from "../typing/components/KeyboardTypes";
+import { Keyboard, KeyObjBase, KeyType } from "../typing/components/KeyboardTypes";
+
+const LETTERS: string[][] = [
+  ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
+  ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+  ["z", "x", "c", "v", "b", "n", "m"],
+];
+
+const DEFAULT_ACTION_KEY_STYLE = "!w-1/3 !h-10 text-white";
+
+const getDefaultLetter = (
+  key: string,
+  x: number,
+  y: number,
+  type: KeyType = KeyType.LETTER,
+  style: string = "",
+): KeyObjBase => {
+  return {
+    key,
+    style,
+    type,
+    location: [x, y],
+  };
+};
 
 export const getDefaultKeyboard = (): Keyboard => {
+  const initialKeyboard: Keyboard = [];
+  for (let i = 0; i < LETTERS.length; i++) {
+    initialKeyboard.push([]);
+    for (let j = 0; j < LETTERS[i].length; j++) {
+      const letter = LETTERS[i][j];
+      initialKeyboard[i].push(getDefaultLetter(letter, i, j));
+    }
+  }
   return [
+    ...initialKeyboard,
     [
-      { key: "q", style: "", type: KeyType.LETTER, location: [0, 0] },
-      { key: "w", style: "", type: KeyType.LETTER, location: [0, 1] },
-      { key: "e", style: "", type: KeyType.LETTER, location: [0, 2] },
-      { key: "r", style: "", type: KeyType.LETTER, location: [0, 3] },
-      { key: "t", style: "", type: KeyType.LETTER, location: [0, 4] },
-      { key: "y", style: "", type: KeyType.LETTER, location: [0, 5] },
-      { key: "u", style: "", type: KeyType.LETTER, location: [0, 6] },
-      { key: "i", style: "", type: KeyType.LETTER, location: [0, 7] },
-      { key: "o", style: "", type: KeyType.LETTER, location: [0, 8] },
-      { key: "p", style: "", type: KeyType.LETTER, location: [0, 9] },
-    ],
-    [
-      { key: "a", style: "", type: KeyType.LETTER, location: [1, 0] },
-      { key: "s", style: "", type: KeyType.LETTER, location: [1, 1] },
-      { key: "d", style: "", type: KeyType.LETTER, location: [1, 2] },
-      { key: "f", style: "", type: KeyType.LETTER, location: [1, 3] },
-      { key: "g", style: "", type: KeyType.LETTER, location: [1, 4] },
-      { key: "h", style: "", type: KeyType.LETTER, location: [1, 5] },
-      { key: "j", style: "", type: KeyType.LETTER, location: [1, 6] },
-      { key: "k", style: "", type: KeyType.LETTER, location: [1, 7] },
-      { key: "l", style: "", type: KeyType.LETTER, location: [1, 8] },
-    ],
-    [
-      { key: "z", style: "", type: KeyType.LETTER, location: [2, 0] },
-      { key: "x", style: "", type: KeyType.LETTER, location: [2, 1] },
-      { key: "c", style: "", type: KeyType.LETTER, location: [2, 2] },
-      { key: "v", style: "", type: KeyType.LETTER, location: [2, 3] },
-      { key: "b", style: "", type: KeyType.LETTER, location: [2, 4] },
-      { key: "n", style: "", type: KeyType.LETTER, location: [2, 5] },
-      { key: "m", style: "", type: KeyType.LETTER, location: [2, 6] },
-    ],
-    [
-      {
-        key: "delete letter",
-        style: "!w-1/3 !h-10 bg-secondary text-white",
-        type: KeyType.DELETE,
-        location: [3, 0],
-      },
-      {
-        key: "enter guess",
-        style: "!w-1/3 !h-10 bg-tertiary text-white",
-        type: KeyType.ENTER,
-        location: [3, 1],
-      },
+      getDefaultLetter(
+        "delete letter",
+        3,
+        0,
+        KeyType.DELETE,
+        `${DEFAULT_ACTION_KEY_STYLE} bg-secondary`,
+      ),
+      getDefaultLetter(
+        "enter guess",
+        3,
+        1,
+        KeyType.ENTER,
+        `${DEFAULT_ACTION_KEY_STYLE} bg-tertiary`,
+      ),
     ],
   ];
 };

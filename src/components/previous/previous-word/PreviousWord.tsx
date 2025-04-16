@@ -1,8 +1,4 @@
-import { WordData } from "../../../typing/components/AppTypes";
-
-type PreviousWordProps = {
-  wordObject: WordData;
-};
+import { PreviousWordProps } from "../../../typing/components/Previous";
 
 export default function PreviousWord({ wordObject }: PreviousWordProps) {
   return (

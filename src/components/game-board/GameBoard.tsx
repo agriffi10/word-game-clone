@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { Board, GameBoardProps, LetterBoxBaseType } from "../../typing/components/GameBoardTypes";
 import { getNewGameBoard, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
-import { GameStyles } from "../../typing/enums/GameStyles";
 import LetterBoxBase from "../letter-box/LetterBoxBase";
 import { determineLetterStyle } from "../../utils/GameHelpers";
 
@@ -17,7 +16,7 @@ export default function GameBoard({
   const [currentLetterIdx, setCurrentLetterIdx] = useState(0);
 
   const setLetterOnBoard = () => {
-    const defaultStyle = "bg-gray-300"
+    const defaultStyle = "bg-gray-300";
     const newBoard = [...board];
     for (let i = 0; i < currentGuess.length; i++) {
       const currentLetterBox = {
@@ -95,7 +94,7 @@ export default function GameBoard({
       {board.map((boardRow, arrIndex) => (
         <div
           key={arrIndex}
-          className="my-1 flex w-full mb-2 justify-around">
+          className="my-1 mb-2 flex w-full justify-around">
           {boardRow.map((letter, letterIdx) => (
             <LetterBoxBase
               key={arrIndex.toString() + letterIdx}

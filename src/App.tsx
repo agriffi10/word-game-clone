@@ -9,7 +9,7 @@ import Modal from "./components/modal/Modal";
 import { Guess, WordData } from "./typing/components/AppTypes";
 import { GameViewState } from "./typing/enums/ViewStates";
 import PreviousBoard from "./components/previous/previous-board/PreviousBoard";
-import LinkButton from "./components/buttons/LinkButton";
+import UserActionButton from "./components/buttons/UserActionButton";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -179,13 +179,7 @@ function App() {
         <div className="bg-primary shadow-thin sm:shadow-thick mx-auto w-full max-w-[600px] overflow-hidden rounded-lg p-2 md:p-5">
           <div className="stage">
             <div className={`scene ${getGameBoardStyle()}`}>
-              <div className="w-full text-right">
-                <LinkButton
-                  viewState={GameViewState.PREVIOUS}
-                  callback={updateViewState}>
-                  View Finished Words
-                </LinkButton>
-              </div>
+              <div className="w-full text-right"></div>
               <GameBoard
                 currentRowIdx={currentRow}
                 currentGuess={currentGuess}
@@ -202,31 +196,26 @@ function App() {
               />
             </div>
             <div className={`scene ${getPreviousBoardStyle()}`}>
-              <div className="w-full text-left">
-                <LinkButton
-                  viewState={GameViewState.GAME}
-                  callback={updateViewState}>
-                  Back To Game
-                </LinkButton>
-              </div>
               <h2 className="mb-3 text-3xl">Previous Words</h2>
               <PreviousBoard wordList={wordsList} />
             </div>
           </div>
-          <button
-            type="button"
-            className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-            onClick={() => clearWordCache()}>
-            Clear Word Cache
-          </button>
-          {hasFinished && (
-            <button
-              type="button"
-              className="mx-2 mt-5 w-full rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-              onClick={() => resetGame()}>
-              Play Again
-            </button>
+          {viewState == GameViewState.GAME && (
+            <UserActionButton
+              arg={GameViewState.PREVIOUS}
+              callback={updateViewState}>
+              View Finished Words
+            </UserActionButton>
           )}
+          {viewState == GameViewState.PREVIOUS && (
+            <UserActionButton
+              arg={GameViewState.GAME}
+              callback={updateViewState}>
+              Back To Game
+            </UserActionButton>
+          )}
+          <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+          {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
         </div>
         <Modal show={showModal}>
           <div>
