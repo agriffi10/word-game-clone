@@ -9,6 +9,7 @@
   --color-found: #f9f871;
   --color-correct: #00c9a7;
   --shadow-thick: 5px 5px 1px 1px black;
+  --shadow-thin: 2px 2px 1px 1px black;
 }
 
 main {

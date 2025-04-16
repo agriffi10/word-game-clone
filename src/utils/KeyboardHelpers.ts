@@ -26,15 +26,27 @@ export const getDefaultKeyboard = (): Keyboard => {
       { key: "l", style: "", type: KeyType.LETTER, location: [1, 8] },
     ],
     [
-      { key: "delete", style: "w-16 bg-secondary text-white", type: KeyType.DELETE, location: [2, 0] },
-      { key: "z", style: "", type: KeyType.LETTER, location: [2, 1] },
-      { key: "x", style: "", type: KeyType.LETTER, location: [2, 2] },
-      { key: "c", style: "", type: KeyType.LETTER, location: [2, 3] },
-      { key: "v", style: "", type: KeyType.LETTER, location: [2, 4] },
-      { key: "b", style: "", type: KeyType.LETTER, location: [2, 5] },
-      { key: "n", style: "", type: KeyType.LETTER, location: [2, 6] },
-      { key: "m", style: "", type: KeyType.LETTER, location: [2, 7] },
-      { key: "enter", style: "w-16 bg-tertiary text-white", type: KeyType.ENTER, location: [2, 8] },
+      { key: "z", style: "", type: KeyType.LETTER, location: [2, 0] },
+      { key: "x", style: "", type: KeyType.LETTER, location: [2, 1] },
+      { key: "c", style: "", type: KeyType.LETTER, location: [2, 2] },
+      { key: "v", style: "", type: KeyType.LETTER, location: [2, 3] },
+      { key: "b", style: "", type: KeyType.LETTER, location: [2, 4] },
+      { key: "n", style: "", type: KeyType.LETTER, location: [2, 5] },
+      { key: "m", style: "", type: KeyType.LETTER, location: [2, 6] },
+    ],
+    [
+      {
+        key: "delete letter",
+        style: "!w-1/3 !h-10 bg-secondary text-white",
+        type: KeyType.DELETE,
+        location: [3, 0],
+      },
+      {
+        key: "enter guess",
+        style: "!w-1/3 !h-10 bg-tertiary text-white",
+        type: KeyType.ENTER,
+        location: [3, 1],
+      },
     ],
   ];
 };
