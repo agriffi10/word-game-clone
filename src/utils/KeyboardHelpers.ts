@@ -1,4 +1,5 @@
-import { Keyboard, KeyObjBase, KeyType } from "../typing/components/KeyboardTypes";
+import { Keyboard, KeyObjBase } from "../typing/components/KeyboardTypes";
+import { LetterKeyType } from "../typing/enums/KeyboardTypes";
 
 const LETTERS: string[][] = [
   ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
@@ -12,7 +13,7 @@ const getDefaultLetter = (
   key: string,
   x: number,
   y: number,
-  type: KeyType = KeyType.LETTER,
+  type: LetterKeyType = LetterKeyType.LETTER,
   style: string = "",
 ): KeyObjBase => {
   return {
@@ -39,14 +40,14 @@ export const getDefaultKeyboard = (): Keyboard => {
         "delete letter",
         3,
         0,
-        KeyType.DELETE,
+        LetterKeyType.DELETE,
         `${DEFAULT_ACTION_KEY_STYLE} bg-secondary`,
       ),
       getDefaultLetter(
         "enter guess",
         3,
         1,
-        KeyType.ENTER,
+        LetterKeyType.ENTER,
         `${DEFAULT_ACTION_KEY_STYLE} bg-tertiary`,
       ),
     ],

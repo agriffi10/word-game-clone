@@ -8,3 +8,7 @@ export type WordData = {
 };
 
 export type Guess = KeyObjBase[];
+
+export type BoardWrapperProps = {
+  children: React.ReactNode | React.ReactNode[];
+};

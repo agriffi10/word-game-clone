@@ -18,7 +18,7 @@ export default function Modal({ show, children }: ModalProps) {
         <div
           ref={modalRef}
           tabIndex={1}
-          className={`inner max-h absolute top-0 left-0 h-screen max-h-screen w-screen overflow-auto rounded-sm bg-white p-8 opacity-100 sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-w-[600px] sm:-translate-x-1/2 sm:-translate-y-1/2 lg:max-w-[950px]`}>
+          className={`inner shadow-thin sm:shadow-thick max-h bg-accent-2 absolute top-0 left-0 h-screen max-h-screen w-screen overflow-auto rounded-lg p-8 opacity-100 sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-w-[500px] sm:-translate-x-1/2 sm:-translate-y-1/2`}>
           {children}
         </div>
       </FocusLock>

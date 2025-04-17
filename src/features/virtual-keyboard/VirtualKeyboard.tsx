@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import {
-  VirtualKeyboardProps,
-  Keyboard,
-  KeyType,
-  KeyObjBase,
-} from "../../typing/components/KeyboardTypes";
+import { VirtualKeyboardProps, Keyboard, KeyObjBase } from "../../typing/components/KeyboardTypes";
 import { getDefaultKeyboard } from "../../utils/KeyboardHelpers";
 import { determineLetterStyle } from "../../utils/GameHelpers";
+import KeyboardLetter from "../../components/keyboard-letter/KeyboardLetter";
+import { LetterKeyType } from "../../typing/enums/KeyboardTypes";
 
 export default function VirtualKeyboard({
   enterLetter,
@@ -46,11 +43,12 @@ export default function VirtualKeyboard({
   };
 
   const keyboardClick = (keyObj: KeyObjBase) => {
-    if (keyObj.type === KeyType.LETTER) {
+    const letterType = keyObj.type as LetterKeyType;
+    if (letterType == LetterKeyType.LETTER) {
       enterLetter(keyObj);
-    } else if (keyObj.type === KeyType.DELETE) {
+    } else if (letterType == LetterKeyType.DELETE) {
       deleteLetter();
-    } else if (keyObj.type === KeyType.ENTER) {
+    } else if (letterType == LetterKeyType.ENTER) {
       checkWord();
     }
   };
@@ -66,13 +64,11 @@ export default function VirtualKeyboard({
           className="my-1.5"
           key={rowIdx}>
           {keyboardRow.map((keyObj) => (
-            <button
+            <KeyboardLetter
+              keyObj={keyObj}
+              callback={keyboardClick}
               key={keyObj.key}
-              type="button"
-              className={`shadow-thin sm:shadow-thick mx-1 my-1 h-6 w-6 transform cursor-pointer rounded-md bg-gray-200 text-gray-900 sm:mx-1.5 sm:h-10 sm:w-10 ${keyObj.style}`}
-              onClick={() => keyboardClick(keyObj)}>
-              {keyObj.key.toUpperCase()}
-            </button>
+            />
           ))}
         </div>
       ))}

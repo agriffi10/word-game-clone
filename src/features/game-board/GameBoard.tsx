@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Board, GameBoardProps, LetterBoxBaseType } from "../../typing/components/GameBoardTypes";
 import { getNewGameBoard, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
-import LetterBoxBase from "../letter-box/LetterBoxBase";
+import LetterBoxBase from "../../components/letter-box/LetterBoxBase";
 import { determineLetterStyle } from "../../utils/GameHelpers";
 
 export default function GameBoard({

@@ -1,15 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import "./App.css";
-import GameBoard from "./components/game-board/GameBoard";
-import VirtualKeyboard from "./components/virtual-keyboard/VirtualKeyboard";
+import GameBoard from "./features/game-board/GameBoard";
+import VirtualKeyboard from "./features/virtual-keyboard/VirtualKeyboard";
 
 import { KeyObjBase } from "./typing/components/KeyboardTypes";
 import Modal from "./components/modal/Modal";
 import { Guess, WordData } from "./typing/components/AppTypes";
 import { GameViewState } from "./typing/enums/ViewStates";
-import PreviousBoard from "./components/previous/previous-board/PreviousBoard";
 import UserActionButton from "./components/buttons/UserActionButton";
+import BoardWrapper from "./components/board-wrapper/BoardWrapper";
+import useToggle from "./hooks/Toggle";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -23,10 +24,11 @@ function App() {
   });
   const [wordsList, setWordsList] = useState<WordData[]>([]);
   const [viewState, setViewState] = useState<GameViewState>(GameViewState.GAME);
-  const [showModal, setShowModal] = useState(false);
+  const [showEndModal, setShowEndModal] = useToggle();
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
   };
+  const [showDirections, setShowDirections] = useToggle(true);
 
   const hasWon = () => {
     return getCurrentGuessWord() == currentWord.word;
@@ -82,7 +84,7 @@ function App() {
     newWord.isSolved = true;
     newWord.currentWord = false;
     updateWordInMemory(null, newWord);
-    toggleModal();
+    setShowEndModal();
   };
 
   const getGameOverText = () => {
@@ -97,10 +99,6 @@ function App() {
     resetGuess();
     setHasFinished(false);
     getNewWord();
-  };
-
-  const toggleModal = () => {
-    setShowModal((prev) => !prev);
   };
 
   /**
@@ -147,14 +145,6 @@ function App() {
     setViewState(() => state);
   };
 
-  const getGameBoardStyle = () => {
-    return viewState == GameViewState.GAME ? "" : "move-right";
-  };
-
-  const getPreviousBoardStyle = () => {
-    return viewState == GameViewState.PREVIOUS ? "" : "move-left";
-  };
-
   useEffect(() => {
     const words = localStorage.getItem("words");
     if (words) {
@@ -175,62 +165,77 @@ function App() {
 
   return (
     <div className="bg-accent flex h-screen w-screen items-center justify-center p-2 text-center sm:p-5">
-      <main className="mx-auto w-full max-w-[800px]">
-        <div className="bg-primary shadow-thin sm:shadow-thick mx-auto w-full max-w-[600px] overflow-hidden rounded-lg p-2 md:p-5">
-          <div className="stage">
-            <div className={`scene ${getGameBoardStyle()}`}>
-              <div className="w-full text-right"></div>
-              <GameBoard
-                currentRowIdx={currentRow}
-                currentGuess={currentGuess}
-                currentWord={currentWord.word}
-                resetGuess={resetGuess}
-                endTheGame={endTheGame}
-              />
-              <VirtualKeyboard
-                enterGuess={enterGuess}
-                enterLetter={enterLetter}
-                deleteLetter={deleteLetter}
-                currentWord={currentWord.word}
-                currentGuess={currentGuess}
-              />
-            </div>
-            <div className={`scene ${getPreviousBoardStyle()}`}>
-              <h2 className="mb-3 text-3xl">Previous Words</h2>
-              <PreviousBoard wordList={wordsList} />
-            </div>
-          </div>
-          {viewState == GameViewState.GAME && (
-            <UserActionButton
-              arg={GameViewState.PREVIOUS}
-              callback={updateViewState}>
-              View Finished Words
-            </UserActionButton>
-          )}
-          {viewState == GameViewState.PREVIOUS && (
-            <UserActionButton
-              arg={GameViewState.GAME}
-              callback={updateViewState}>
-              Back To Game
-            </UserActionButton>
-          )}
-          <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
-          {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
+      <main className="mx-auto w-full">
+        <div className="flex w-full">
+          <BoardWrapper>
+            <div className="w-full text-right"></div>
+            <GameBoard
+              currentRowIdx={currentRow}
+              currentGuess={currentGuess}
+              currentWord={currentWord.word}
+              resetGuess={resetGuess}
+              endTheGame={endTheGame}
+            />
+            <VirtualKeyboard
+              enterGuess={enterGuess}
+              enterLetter={enterLetter}
+              deleteLetter={deleteLetter}
+              currentWord={currentWord.word}
+              currentGuess={currentGuess}
+            />
+            {viewState == GameViewState.GAME && (
+              <UserActionButton
+                arg={GameViewState.PREVIOUS}
+                callback={updateViewState}>
+                View Finished Words
+              </UserActionButton>
+            )}
+            {viewState == GameViewState.PREVIOUS && (
+              <UserActionButton
+                arg={GameViewState.GAME}
+                callback={updateViewState}>
+                Back To Game
+              </UserActionButton>
+            )}
+            <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+            {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
+          </BoardWrapper>
         </div>
-        <Modal show={showModal}>
-          <div>
+
+        <Modal show={showEndModal}>
+          <div className="text-left text-white">
             <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
             <h3 className="mb-3 text-2xl">The word was {currentWord.word.toUpperCase()}</h3>
             <p>
               You took {currentRow} guess{currentRow > 1 ? "es" : ""}
             </p>
-            <div className="mt-5 flex justify-center">
-              <button
-                type="button"
-                className="mx-2 w-32 rounded-md bg-blue-500 px-4 py-2 text-white shadow-lg transition-transform active:scale-x-75"
-                onClick={() => toggleModal()}>
-                close
-              </button>
+            <div className="mx-auto mt-5 flex w-full max-w-[200px] justify-center">
+              <UserActionButton callback={setShowEndModal}>Close</UserActionButton>
+            </div>
+          </div>
+        </Modal>
+        <Modal show={showDirections}>
+          <div className="text-left text-white">
+            <h2 className="mb-3 text-3xl">Word Game Directions</h2>
+            <p className="mb-2">
+              Welcome to my word game! You have six tries to guess the word that has been randomly
+              selected.
+            </p>
+            <p className="mb-2">
+              You can use the on-screen keyboard to type in letters to form a guess. Every guess has
+              to have six letters. Once you have six letters, click the "Enter Guess" button to see
+              if you found the word.
+            </p>
+            <p className="mb-2">
+              Every time you enter a guess, the boxes of the letters will change colors. Green means
+              you got the right letter in the right spot, and yellow means you've found a letter but
+              it wasn't in the right spot.
+            </p>
+            <p className="mb-2">
+              The game ends when you've exhausted all six guesses or found the word!
+            </p>
+            <div className="mx-auto mt-5 flex w-full max-w-[200px] justify-center">
+              <UserActionButton callback={setShowDirections}>Close Directions</UserActionButton>
             </div>
           </div>
         </Modal>
