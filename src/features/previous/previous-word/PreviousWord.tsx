@@ -1,4 +1,4 @@
-import { PreviousWordProps } from "../../../typing/components/Previous";
+import { PreviousWordProps } from "../../../typing/components/ComponentProps";
 
 export default function PreviousWord({ wordObject }: PreviousWordProps) {
   return (

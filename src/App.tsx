@@ -4,19 +4,18 @@ import "./App.css";
 import GameBoard from "./features/game-board/GameBoard";
 import VirtualKeyboard from "./features/virtual-keyboard/VirtualKeyboard";
 
-import { KeyObjBase } from "./typing/components/KeyboardTypes";
-import Modal from "./components/modal/Modal";
-import { Guess, WordData } from "./typing/components/AppTypes";
 import UserActionButton from "./components/buttons/UserActionButton";
 import BoardWrapper from "./components/board-wrapper/BoardWrapper";
 import useToggle from "./hooks/Toggle";
 import GuessesView from "./features/guesses-view/GuessesView";
 import PastWords from "./features/past-words/PastWords";
+import { KeyDataArray, KeyObjBase, WordData } from "./typing/components/BaseTypes";
+import Modal from "./components/modal/Modal";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
   const [currentRow, setCurrentRow] = useState(0);
-  const [currentGuess, setCurrentGuess] = useState<Guess>([]);
+  const [currentGuess, setCurrentGuess] = useState<KeyDataArray>([]);
   const [currentWord, setCurrentWord] = useState<WordData>({
     word: "",
     isSolved: false,

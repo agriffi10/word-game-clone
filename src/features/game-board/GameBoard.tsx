@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import { Board, GameBoardProps, LetterBoxBaseType } from "../../typing/components/GameBoardTypes";
+
 import { getNewGameBoard, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
 import LetterBoxBase from "../../components/letter-box/LetterBoxBase";
 import { determineLetterStyle } from "../../utils/GameHelpers";
+import { Board, LetterBoxBaseType } from "../../typing/components/BaseTypes";
+import { GameBoardProps } from "../../typing/components/ComponentProps";
 
 export default function GameBoard({
   currentRowIdx,

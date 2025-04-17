@@ -1,5 +1,5 @@
 import UserActionButton from "../../components/buttons/UserActionButton";
-import { PastWordsProps } from "../../typing/components/PastWords";
+import { PastWordsProps } from "../../typing/components/ComponentProps";
 
 export default function PastWords({ wordsList, setShowFinishedWords }: PastWordsProps) {
   return (

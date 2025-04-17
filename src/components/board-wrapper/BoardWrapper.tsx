@@ -1,4 +1,4 @@
-import { BoardWrapperProps } from "../../typing/components/AppTypes";
+import { BoardWrapperProps } from "../../typing/components/ComponentProps";
 
 export default function BoardWrapper({ children }: BoardWrapperProps) {
   return (

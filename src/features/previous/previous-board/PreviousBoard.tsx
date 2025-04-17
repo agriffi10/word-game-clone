@@ -1,4 +1,4 @@
-import { PreviousBoardProps } from "../../../typing/components/Previous";
+import { PreviousBoardProps } from "../../../typing/components/ComponentProps";
 import PreviousWord from "../previous-word/PreviousWord";
 
 export default function PreviousBoard({ wordList }: PreviousBoardProps) {

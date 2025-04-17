@@ -1,4 +1,4 @@
-import { GuessesViewProps } from "../../typing/components/GuessesView";
+import { GuessesViewProps } from "../../typing/components/ComponentProps";
 
 export default function GuessesView({ currentGuess, currentWord, guessWord }: GuessesViewProps) {
   return (

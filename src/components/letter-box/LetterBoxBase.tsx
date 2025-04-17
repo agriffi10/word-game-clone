@@ -1,4 +1,4 @@
-import { LetterBoxBaseProps } from "../../typing/components/LetterBoxTypes";
+import { LetterBoxBaseProps } from "../../typing/components/ComponentProps";
 
 export default function LetterBoxBase({ letter }: LetterBoxBaseProps) {
   return (

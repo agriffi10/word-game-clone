@@ -1,4 +1,4 @@
-import { UserActionButtonProps } from "../../typing/components/UserActionButtonProps";
+import { UserActionButtonProps } from "../../typing/components/ComponentProps";
 
 export default function UserActionButton({ callback, arg, children }: UserActionButtonProps) {
   return (

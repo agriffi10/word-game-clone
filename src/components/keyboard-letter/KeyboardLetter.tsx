@@ -1,4 +1,4 @@
-import { KeyboardLetterProps } from "../../typing/components/KeyboardTypes";
+import { KeyboardLetterProps } from "../../typing/components/ComponentProps";
 
 export default function KeyboardLetter({ keyObj, callback }: KeyboardLetterProps) {
   return (
