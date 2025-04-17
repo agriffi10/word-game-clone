@@ -7,10 +7,11 @@ import VirtualKeyboard from "./features/virtual-keyboard/VirtualKeyboard";
 import { KeyObjBase } from "./typing/components/KeyboardTypes";
 import Modal from "./components/modal/Modal";
 import { Guess, WordData } from "./typing/components/AppTypes";
-import { GameViewState } from "./typing/enums/ViewStates";
 import UserActionButton from "./components/buttons/UserActionButton";
 import BoardWrapper from "./components/board-wrapper/BoardWrapper";
 import useToggle from "./hooks/Toggle";
+import GuessesView from "./features/guesses-view/GuessesView";
+import PastWords from "./features/past-words/PastWords";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -23,12 +24,12 @@ function App() {
     currentWord: false,
   });
   const [wordsList, setWordsList] = useState<WordData[]>([]);
-  const [viewState, setViewState] = useState<GameViewState>(GameViewState.GAME);
   const [showEndModal, setShowEndModal] = useToggle();
+  const [showDirections, setShowDirections] = useToggle(true);
+  const [showFinishedWords, setShowFinishedWords] = useToggle(false);
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
   };
-  const [showDirections, setShowDirections] = useToggle(true);
 
   const hasWon = () => {
     return getCurrentGuessWord() == currentWord.word;
@@ -112,8 +113,9 @@ function App() {
     }
     const currentWord = data.find((wordObj) => wordObj.currentWord == true);
     if (currentWord) {
-      console.log("Word already used today: ", currentWord.word);
-      setCurrentWord(currentWord);
+      const updatedWord = { ...currentWord, guesses: [] };
+      console.log("Word already used today: ", updatedWord.word);
+      setCurrentWord(() => updatedWord);
       return;
     }
     const filteredList = data.filter((wordObj) => wordObj.isSolved == false);
@@ -141,10 +143,6 @@ function App() {
     setWordsList(() => newWordsList);
   };
 
-  const updateViewState = (state: GameViewState) => {
-    setViewState(() => state);
-  };
-
   useEffect(() => {
     const words = localStorage.getItem("words");
     if (words) {
@@ -168,36 +166,49 @@ function App() {
       <main className="mx-auto w-full">
         <div className="flex w-full">
           <BoardWrapper>
-            <div className="w-full text-right"></div>
-            <GameBoard
-              currentRowIdx={currentRow}
-              currentGuess={currentGuess}
-              currentWord={currentWord.word}
-              resetGuess={resetGuess}
-              endTheGame={endTheGame}
-            />
-            <VirtualKeyboard
-              enterGuess={enterGuess}
-              enterLetter={enterLetter}
-              deleteLetter={deleteLetter}
-              currentWord={currentWord.word}
-              currentGuess={currentGuess}
-            />
-            {viewState == GameViewState.GAME && (
-              <UserActionButton
-                arg={GameViewState.PREVIOUS}
-                callback={updateViewState}>
-                View Finished Words
-              </UserActionButton>
-            )}
-            {viewState == GameViewState.PREVIOUS && (
-              <UserActionButton
-                arg={GameViewState.GAME}
-                callback={updateViewState}>
-                Back To Game
-              </UserActionButton>
-            )}
-            <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+            <h1 className="mb-2 text-4xl text-white">Word Game</h1>
+
+            <section>
+              <div className="my-4 w-full sm:flex sm:justify-between">
+                <div>
+                  <UserActionButton callback={setShowDirections}>View Directions</UserActionButton>
+                </div>
+                <div>
+                  <UserActionButton callback={setShowFinishedWords}>
+                    View Finished Words
+                  </UserActionButton>
+                </div>
+                <div>
+                  <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+                </div>
+              </div>
+            </section>
+            <section>
+              <GameBoard
+                currentRowIdx={currentRow}
+                currentGuess={currentGuess}
+                currentWord={currentWord.word}
+                resetGuess={resetGuess}
+                endTheGame={endTheGame}
+              />
+            </section>
+            <section>
+              <GuessesView
+                currentGuess={currentGuess}
+                currentWord={currentWord}
+                guessWord={getCurrentGuessWord()}
+              />
+            </section>
+            <section>
+              <VirtualKeyboard
+                enterGuess={enterGuess}
+                enterLetter={enterLetter}
+                deleteLetter={deleteLetter}
+                currentWord={currentWord.word}
+                currentGuess={currentGuess}
+              />
+            </section>
+
             {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
           </BoardWrapper>
         </div>
@@ -210,7 +221,7 @@ function App() {
               You took {currentRow} guess{currentRow > 1 ? "es" : ""}
             </p>
             <div className="mx-auto mt-5 flex w-full max-w-[200px] justify-center">
-              <UserActionButton callback={setShowEndModal}>Close</UserActionButton>
+              <UserActionButton callback={setShowEndModal}>Close Endgame Modal</UserActionButton>
             </div>
           </div>
         </Modal>
@@ -238,6 +249,12 @@ function App() {
               <UserActionButton callback={setShowDirections}>Close Directions</UserActionButton>
             </div>
           </div>
+        </Modal>
+        <Modal show={showFinishedWords}>
+          <PastWords
+            wordsList={wordsList}
+            setShowFinishedWords={setShowFinishedWords}
+          />
         </Modal>
       </main>
     </div>
