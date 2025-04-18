@@ -53,3 +53,7 @@ export const getDefaultKeyboard = (): Keyboard => {
     ],
   ];
 };
+
+export const cloneKeyboard = (keyboard: Keyboard): Keyboard => {
+  return keyboard.map((row) => row.map((cell) => ({ ...cell })));
+};

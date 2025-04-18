@@ -162,27 +162,11 @@ function App() {
   }, []);
 
   return (
-    <div className="bg-accent flex h-screen w-screen items-center justify-center p-2 text-center sm:p-5">
+    <div className="bg-accent flex h-screen w-screen items-center justify-center overflow-auto p-2 text-center sm:p-5">
       <main className="mx-auto w-full">
         <div className="flex w-full">
           <BoardWrapper>
             <h1 className="mb-2 text-4xl text-white">Word Game</h1>
-
-            <section>
-              <div className="my-4 w-full sm:flex sm:justify-between">
-                <div>
-                  <UserActionButton callback={setShowDirections}>View Directions</UserActionButton>
-                </div>
-                <div>
-                  <UserActionButton callback={setShowFinishedWords}>
-                    View Finished Words
-                  </UserActionButton>
-                </div>
-                <div>
-                  <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
-                </div>
-              </div>
-            </section>
             <section>
               <GameBoard
                 currentRowIdx={currentRow}
@@ -207,6 +191,22 @@ function App() {
                 currentWord={currentWord}
                 guessWord={getCurrentGuessWord()}
               />
+            </section>
+
+            <section aria-label="Game Options">
+              <div className="w-full sm:my-4 sm:flex sm:justify-between">
+                <div className="mb-2">
+                  <UserActionButton callback={setShowDirections}>View Directions</UserActionButton>
+                </div>
+                <div className="mb-2">
+                  <UserActionButton callback={setShowFinishedWords}>
+                    View Finished Words
+                  </UserActionButton>
+                </div>
+                <div className="mb-2">
+                  <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+                </div>
+              </div>
             </section>
 
             {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}

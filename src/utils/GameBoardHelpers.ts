@@ -19,3 +19,7 @@ export const getNewGameBoard = (): Board => {
     ),
   );
 };
+
+export const cloneBoard = (board: Board): Board => {
+  return board.map((row) => row.map((cell) => ({ ...cell })));
+};

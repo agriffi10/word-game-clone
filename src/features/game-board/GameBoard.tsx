@@ -1,7 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 
-import { getNewGameBoard, MAX_LETTER_INDEX } from "../../utils/GameBoardHelpers";
+import {
+  cloneBoard,
+  getNewGameBoard,
+  MAX_LETTER_INDEX,
+  MAX_ROW_INDEX,
+} from "../../utils/GameBoardHelpers";
 import LetterBoxBase from "../../components/letter-box/LetterBoxBase";
 import { determineLetterStyle } from "../../utils/GameHelpers";
 import { Board, LetterBoxBaseType } from "../../typing/components/BaseTypes";
@@ -19,7 +24,7 @@ export default function GameBoard({
 
   const setLetterOnBoard = () => {
     const defaultStyle = "bg-gray-300";
-    const newBoard = [...board];
+    const newBoard = cloneBoard(board);
     for (let i = 0; i < currentGuess.length; i++) {
       const currentLetterBox = {
         key: currentGuess[i].key,
@@ -37,12 +42,11 @@ export default function GameBoard({
       };
       newBoard[currentRowIdx][i] = currentLetterBox;
     }
-    console.log(newBoard);
-    setBoard(() => newBoard);
+    setBoard(newBoard);
   };
 
   const getUpdatedBoard = (coordinates: LetterBoxBaseType[]): Board => {
-    const newBoard = [...board];
+    const newBoard = cloneBoard(board);
     for (let i = 0; i < coordinates.length; i++) {
       const letterObj = coordinates[i];
       const rowIdx = letterObj.location[0];
@@ -54,18 +58,19 @@ export default function GameBoard({
   };
 
   const updateBoard = () => {
+    const newBoard = cloneBoard(board);
     const coordinates: LetterBoxBaseType[] = [];
     for (let i = 0; i < currentGuess.length; i++) {
-      const letterObj = board[currentRowIdx - 1][i];
+      const letterObj = newBoard[currentRowIdx - 1][i];
       const letter = letterObj.key;
       letterObj.style = determineLetterStyle(currentWord.word, letter, i, letterObj.style);
       coordinates.push(letterObj);
     }
     const newKeyboard = getUpdatedBoard(coordinates);
     console.log(newKeyboard);
-    setBoard(() => newKeyboard);
+    setBoard(newKeyboard);
     if (
-      currentRowIdx > MAX_LETTER_INDEX ||
+      currentRowIdx > MAX_ROW_INDEX ||
       currentGuess.map((x) => x.key).join("") == currentWord.word
     ) {
       endTheGame();
@@ -84,7 +89,8 @@ export default function GameBoard({
       }
       return currentGuess.map((x) => x.key).join("");
     }
-    return currentWord.guesses[boardRowIdx].toUpperCase();
+    const guess = currentWord.guesses[boardRowIdx] || "";
+    return guess.toUpperCase();
   };
 
   useEffect(() => {
@@ -92,7 +98,7 @@ export default function GameBoard({
   }, [currentLetterIdx]);
 
   useEffect(() => {
-    setCurrentLetterIdx(currentGuess.length - 1);
+    setCurrentLetterIdx(currentGuess.length);
   }, [currentGuess]);
 
   useEffect(() => {
@@ -103,8 +109,8 @@ export default function GameBoard({
   }, [currentRowIdx]);
 
   useEffect(() => {
-    setBoard(() => getNewGameBoard());
-  }, [currentWord]);
+    setBoard(getNewGameBoard());
+  }, [currentWord.word]);
 
   return (
     <div className="mx-auto flex w-full flex-wrap">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getDefaultKeyboard } from "../../utils/KeyboardHelpers";
+import { cloneKeyboard, getDefaultKeyboard } from "../../utils/KeyboardHelpers";
 import { determineLetterStyle } from "../../utils/GameHelpers";
 import KeyboardLetter from "../../components/keyboard-letter/KeyboardLetter";
 import { LetterKeyType } from "../../typing/enums/KeyboardTypes";
@@ -17,7 +17,7 @@ export default function VirtualKeyboard({
   const [keyboard, setKeyBoard] = useState<Keyboard>(getDefaultKeyboard());
 
   const setLetterOnBoard = (coordinates: KeyDataArray): Keyboard => {
-    const newKeyboard = [...keyboard];
+    const newKeyboard = cloneKeyboard(keyboard);
     for (let i = 0; i < coordinates.length; i++) {
       const letterObj = coordinates[i];
       const rowIdx = letterObj.location[0];
