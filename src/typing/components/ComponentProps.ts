@@ -9,7 +9,7 @@ export type BoardWrapperProps = {
 export type GameBoardProps = {
   currentRowIdx: number;
   currentGuess: KeyObjBase[];
-  currentWord: string;
+  currentWord: WordData;
   resetGuess: () => void;
   endTheGame: () => void;
 };

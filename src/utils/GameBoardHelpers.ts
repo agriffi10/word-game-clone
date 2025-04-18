@@ -1,4 +1,4 @@
-import { Board, LetterBoxBaseType } from "../typing/components/GameBoardTypes";
+import { LetterBoxBaseType, Board } from "../typing/components/BaseTypes";
 
 const getDefaultLetterBox = (row: number, col: number): LetterBoxBaseType => {
   return {

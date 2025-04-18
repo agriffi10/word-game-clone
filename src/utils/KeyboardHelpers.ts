@@ -1,4 +1,4 @@
-import { Keyboard, KeyObjBase } from "../typing/components/KeyboardTypes";
+import { KeyObjBase, Keyboard } from "../typing/components/BaseTypes";
 import { LetterKeyType } from "../typing/enums/KeyboardTypes";
 
 const LETTERS: string[][] = [

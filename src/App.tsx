@@ -26,6 +26,7 @@ function App() {
   const [showEndModal, setShowEndModal] = useToggle();
   const [showDirections, setShowDirections] = useToggle(true);
   const [showFinishedWords, setShowFinishedWords] = useToggle(false);
+
   const getCurrentGuessWord = () => {
     return currentGuess.map((x) => x.key).join("");
   };
@@ -186,16 +187,9 @@ function App() {
               <GameBoard
                 currentRowIdx={currentRow}
                 currentGuess={currentGuess}
-                currentWord={currentWord.word}
+                currentWord={currentWord}
                 resetGuess={resetGuess}
                 endTheGame={endTheGame}
-              />
-            </section>
-            <section>
-              <GuessesView
-                currentGuess={currentGuess}
-                currentWord={currentWord}
-                guessWord={getCurrentGuessWord()}
               />
             </section>
             <section>
@@ -205,6 +199,13 @@ function App() {
                 deleteLetter={deleteLetter}
                 currentWord={currentWord.word}
                 currentGuess={currentGuess}
+              />
+            </section>
+            <section>
+              <GuessesView
+                currentGuess={currentGuess}
+                currentWord={currentWord}
+                guessWord={getCurrentGuessWord()}
               />
             </section>
 

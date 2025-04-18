@@ -37,6 +37,7 @@ export default function GameBoard({
       };
       newBoard[currentRowIdx][i] = currentLetterBox;
     }
+    console.log(newBoard);
     setBoard(() => newBoard);
   };
 
@@ -57,19 +58,33 @@ export default function GameBoard({
     for (let i = 0; i < currentGuess.length; i++) {
       const letterObj = board[currentRowIdx - 1][i];
       const letter = letterObj.key;
-      letterObj.style = determineLetterStyle(currentWord, letter, i, letterObj.style);
+      letterObj.style = determineLetterStyle(currentWord.word, letter, i, letterObj.style);
       coordinates.push(letterObj);
     }
     const newKeyboard = getUpdatedBoard(coordinates);
+    console.log(newKeyboard);
     setBoard(() => newKeyboard);
     if (
       currentRowIdx > MAX_LETTER_INDEX ||
-      currentGuess.map((x) => x.key).join("") == currentWord
+      currentGuess.map((x) => x.key).join("") == currentWord.word
     ) {
       endTheGame();
     } else {
       resetGuess();
     }
+  };
+
+  const getGuess = (boardRowIdx: number): string => {
+    if (boardRowIdx > currentRowIdx) {
+      return "No guess yet!";
+    }
+    if (boardRowIdx == currentRowIdx) {
+      if (currentGuess.length == 0) {
+        return "No guess yet!";
+      }
+      return currentGuess.map((x) => x.key).join("");
+    }
+    return currentWord.guesses[boardRowIdx].toUpperCase();
   };
 
   useEffect(() => {
@@ -94,7 +109,10 @@ export default function GameBoard({
   return (
     <div className="mx-auto flex w-full flex-wrap">
       {board.map((boardRow, arrIndex) => (
-        <div
+        <section
+          aria-label={`Guess ${arrIndex + 1} - ${getGuess(arrIndex)}`}
+          aria-live="polite"
+          aria-relevant="additions"
           key={arrIndex}
           className="my-1 mb-2 flex w-full justify-around">
           {boardRow.map((letter, letterIdx) => (
@@ -103,7 +121,7 @@ export default function GameBoard({
               letter={letter}
             />
           ))}
-        </div>
+        </section>
       ))}
     </div>
   );
