@@ -109,13 +109,13 @@ function App() {
    */
   const getNewWord = (data: WordData[] | null = null) => {
     if (!data) {
-      data = wordsList;
+      data = JSON.parse(JSON.stringify(wordsList)) as WordData[];
     }
     const currentWord = data.find((wordObj) => wordObj.currentWord == true);
     if (currentWord) {
       const updatedWord = { ...currentWord, guesses: [] };
       console.log("Word already used today: ", updatedWord.word);
-      setCurrentWord(() => updatedWord);
+      setCurrentWord(updatedWord);
       return;
     }
     const filteredList = data.filter((wordObj) => wordObj.isSolved == false);
@@ -124,7 +124,7 @@ function App() {
       return;
     }
     const wordIndex = Math.floor(Math.random() * filteredList.length);
-    const randomWord = filteredList[wordIndex];
+    const randomWord = JSON.parse(JSON.stringify(filteredList[wordIndex]));
     randomWord.currentWord = true;
     updateWordInMemory(data, randomWord);
     setCurrentWord(randomWord);
@@ -194,15 +194,13 @@ function App() {
 
             <section aria-label="Game Options">
               <div className="w-full sm:my-4 sm:flex sm:justify-between">
-                <div className="mb-2">
+                <div className="mb-2 w-full p-2">
                   <UserActionButton callback={setShowDirections}>View Directions</UserActionButton>
                 </div>
-                <div className="mb-2">
-                  <UserActionButton callback={setShowFinishedWords}>
-                    View Finished Words
-                  </UserActionButton>
+                <div className="mb-2 w-full p-2">
+                  <UserActionButton callback={setShowFinishedWords}>View Words</UserActionButton>
                 </div>
-                <div className="mb-2">
+                <div className="mb-2 w-full p-2">
                   <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
                 </div>
               </div>
@@ -227,7 +225,7 @@ function App() {
         <Modal show={showDirections}>
           <div className="text-left text-white">
             <h2 className="mb-3 text-3xl">Word Game Directions</h2>
-            <p className="mb-2">
+            <p className="mb-2 w-full">
               Welcome to my word game! You have six tries to guess the word that has been randomly
               selected.
             </p>

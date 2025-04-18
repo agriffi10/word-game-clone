@@ -30,6 +30,9 @@ export default function VirtualKeyboard({
   };
 
   const checkWord = () => {
+    if (!selectedLetters.length) {
+      return;
+    }
     const coordinates: KeyDataArray = [];
     const letters = selectedLetters.map((x) => x);
     for (let i = 0; i < letters.length; i++) {
@@ -66,6 +69,7 @@ export default function VirtualKeyboard({
   };
 
   useEffect(() => {
+    setSelectedLetters([]);
     setKeyBoard(getDefaultKeyboard());
   }, [currentWord.word]);
 

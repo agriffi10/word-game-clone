@@ -14,7 +14,6 @@ export default function GuessesView({ currentGuess, currentWord, guessWord }: Gu
         const letter = guess[j];
         if (letter == word[j]) {
           letters[j] = letter.toUpperCase();
-          if (j == MAX_LETTER_INDEX) return letters.join(" ");
         }
       }
     }
