@@ -6,27 +6,27 @@ export type BoardWrapperProps = {
   children: React.ReactNode | React.ReactNode[];
 };
 
-export type GameBoardProps = {
-  currentRowIdx: number;
-  currentGuess: KeyObjBase[];
+type BaseGameplayComponentProps = {
+  currentGuess: KeyDataArray;
   currentWord: WordData;
+};
+
+export interface GameBoardProps extends BaseGameplayComponentProps {
+  currentRowIdx: number;
   resetGuess: () => void;
   endTheGame: () => void;
-};
+}
 
-export type GuessesViewProps = {
-  currentGuess: KeyDataArray;
+export interface GuessesViewProps extends BaseGameplayComponentProps {
   guessWord: string;
-  currentWord: WordData;
-};
+}
 
-export type VirtualKeyboardProps = {
-  currentWord: string;
+export interface VirtualKeyboardProps {
+  currentWord: WordData;
   enterLetter: (letter: KeyObjBase) => void;
   deleteLetter: () => void;
   enterGuess: () => void;
-  currentGuess: KeyObjBase[];
-};
+}
 
 export type KeyboardLetterProps = {
   keyObj: KeyObjBase;
@@ -49,6 +49,7 @@ export type PreviousBoardProps = {
 export type PreviousWordProps = {
   wordObject: WordData;
 };
+
 export type UserActionButtonProps = {
   callback: (arg: any) => void;
   arg?: any;

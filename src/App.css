@@ -3,9 +3,10 @@
 @theme {
   --color-primary: #845ec2;
   --color-secondary: #ff6f91;
-  --color-tertiary: #008f7a;
+  --color-tertiary: #296073;
   --color-accent: #008e9b;
   --color-accent-2: #c34a36;
+  --color-primary-button: #4B4453;
   --color-invalid: #b0a8b9;
   --color-found: #f9f871;
   --color-correct: #00c9a7;

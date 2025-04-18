@@ -41,14 +41,14 @@ export const getDefaultKeyboard = (): Keyboard => {
         3,
         0,
         LetterKeyType.DELETE,
-        `${DEFAULT_ACTION_KEY_STYLE} bg-secondary`,
+        `${DEFAULT_ACTION_KEY_STYLE} !bg-accent-2`,
       ),
       getDefaultLetter(
         "enter guess",
         3,
         1,
         LetterKeyType.ENTER,
-        `${DEFAULT_ACTION_KEY_STYLE} bg-tertiary`,
+        `${DEFAULT_ACTION_KEY_STYLE} !bg-tertiary`,
       ),
     ],
   ];

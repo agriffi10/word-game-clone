@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 
 import { cloneKeyboard, getDefaultKeyboard } from "../../utils/KeyboardHelpers";
@@ -12,9 +13,9 @@ export default function VirtualKeyboard({
   deleteLetter,
   enterGuess,
   currentWord,
-  currentGuess,
 }: VirtualKeyboardProps) {
   const [keyboard, setKeyBoard] = useState<Keyboard>(getDefaultKeyboard());
+  const [selectedLetters, setSelectedLetters] = useState<KeyDataArray>([]);
 
   const setLetterOnBoard = (coordinates: KeyDataArray): Keyboard => {
     const newKeyboard = cloneKeyboard(keyboard);
@@ -29,35 +30,48 @@ export default function VirtualKeyboard({
   };
 
   const checkWord = () => {
-    if (currentGuess.length !== currentWord.length) {
-      return;
-    }
     const coordinates: KeyDataArray = [];
-    for (let i = 0; i < currentGuess.length; i++) {
-      const letterObj = currentGuess[i];
+    const letters = selectedLetters.map((x) => x);
+    for (let i = 0; i < letters.length; i++) {
+      const letterObj = letters[i];
       const letter = letterObj.key;
-      letterObj.style = determineLetterStyle(currentWord, letter, i, letterObj.style);
+      letterObj.style = determineLetterStyle(currentWord.word, letter, i, letterObj.style);
       coordinates.push(letterObj);
     }
     const newKeyboard = setLetterOnBoard(coordinates);
-    setKeyBoard(() => newKeyboard);
-    enterGuess();
+    setKeyBoard(newKeyboard);
+    setSelectedLetters([]);
+  };
+
+  const addLetterGuess = (keyObj: KeyObjBase) => {
+    if (selectedLetters.length >= 6) {
+      return;
+    }
+    setSelectedLetters((prev) => [...prev, keyObj]);
   };
 
   const keyboardClick = (keyObj: KeyObjBase) => {
     const letterType = keyObj.type as LetterKeyType;
     if (letterType == LetterKeyType.LETTER) {
+      addLetterGuess(keyObj);
       enterLetter(keyObj);
     } else if (letterType == LetterKeyType.DELETE) {
       deleteLetter();
     } else if (letterType == LetterKeyType.ENTER) {
-      checkWord();
+      if (selectedLetters.length !== currentWord.word.length) {
+        return;
+      }
+      enterGuess();
     }
   };
 
   useEffect(() => {
-    setKeyBoard(() => getDefaultKeyboard());
-  }, [currentWord]);
+    setKeyBoard(getDefaultKeyboard());
+  }, [currentWord.word]);
+
+  useEffect(() => {
+    checkWord();
+  }, [currentWord.guesses]);
 
   return (
     <div>

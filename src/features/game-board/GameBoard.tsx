@@ -67,7 +67,6 @@ export default function GameBoard({
       coordinates.push(letterObj);
     }
     const newKeyboard = getUpdatedBoard(coordinates);
-    console.log(newKeyboard);
     setBoard(newKeyboard);
     if (
       currentRowIdx > MAX_ROW_INDEX ||

@@ -62,10 +62,10 @@ function App() {
       return;
     }
     setCurrentRow((prev) => prev + 1);
-    const updateWord = { ...currentWord };
+    const updateWord = JSON.parse(JSON.stringify(currentWord));
     updateWord.guesses.push(getCurrentGuessWord());
     updateWordInMemory(null, updateWord);
-    setCurrentWord(() => updateWord);
+    setCurrentWord(updateWord);
   };
 
   const validateGuess = () => {
@@ -181,8 +181,7 @@ function App() {
                 enterGuess={enterGuess}
                 enterLetter={enterLetter}
                 deleteLetter={deleteLetter}
-                currentWord={currentWord.word}
-                currentGuess={currentGuess}
+                currentWord={currentWord}
               />
             </section>
             <section>
