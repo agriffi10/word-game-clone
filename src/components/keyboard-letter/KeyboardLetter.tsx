@@ -1,7 +1,8 @@
+import React from "react";
 import { KeyboardLetterProps } from "../../typing/components/ComponentProps";
 import { GameStyles } from "../../typing/enums/GameStyles";
 
-export default function KeyboardLetter({ keyObj, callback }: KeyboardLetterProps) {
+function KeyboardLetter({ keyObj, callback }: KeyboardLetterProps) {
   const letter = keyObj.key.toUpperCase();
   const getTitle = () => {
     let base = `Add letter ${letter} to guess`;
@@ -26,3 +27,5 @@ export default function KeyboardLetter({ keyObj, callback }: KeyboardLetterProps
     </button>
   );
 }
+
+export default React.memo(KeyboardLetter);

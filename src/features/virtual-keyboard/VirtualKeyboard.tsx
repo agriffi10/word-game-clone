@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { cloneKeyboard, getDefaultKeyboard } from "../../utils/KeyboardHelpers";
 import { determineLetterStyle } from "../../utils/GameHelpers";
@@ -17,41 +17,43 @@ export default function VirtualKeyboard({
   const [keyboard, setKeyBoard] = useState<Keyboard>(getDefaultKeyboard());
   const [selectedLetters, setSelectedLetters] = useState<KeyDataArray>([]);
 
-  const setLetterOnBoard = (coordinates: KeyDataArray): Keyboard => {
-    const newKeyboard = cloneKeyboard(keyboard);
-    for (let i = 0; i < coordinates.length; i++) {
-      const letterObj = coordinates[i];
-      const rowIdx = letterObj.location[0];
-      const keyIdx = letterObj.location[1];
-      const style = letterObj.style;
-      newKeyboard[rowIdx][keyIdx].style = style;
-    }
-    return newKeyboard;
-  };
+  const setLetterOnBoard = useCallback((coordinates: KeyDataArray) => {
+    setKeyBoard((prevKeyboard) => {
+      const newKeyboard = cloneKeyboard(prevKeyboard);
+      for (const letterObj of coordinates) {
+        const [rowIdx, keyIdx] = letterObj.location;
+        newKeyboard[rowIdx][keyIdx].style = letterObj.style;
+      }
+      return newKeyboard;
+    });
+  }, []);
 
-  const checkWord = () => {
+  const checkWord = useCallback(() => {
     if (!selectedLetters.length) {
       return;
     }
-    const coordinates: KeyDataArray = [];
-    const letters = selectedLetters.map((x) => x);
-    for (let i = 0; i < letters.length; i++) {
-      const letterObj = letters[i];
-      const letter = letterObj.key;
-      letterObj.style = determineLetterStyle(currentWord.word, letter, i, letterObj.style);
-      coordinates.push(letterObj);
-    }
-    const newKeyboard = setLetterOnBoard(coordinates);
-    setKeyBoard(newKeyboard);
+    const coordinates: KeyDataArray = selectedLetters.map((letterObj, i) => {
+      const updatedStyle = determineLetterStyle(
+        currentWord.word,
+        letterObj.key,
+        i,
+        letterObj.style,
+      );
+      return {
+        ...letterObj,
+        style: updatedStyle,
+      };
+    });
+    setLetterOnBoard(coordinates);
     setSelectedLetters([]);
-  };
+  }, [selectedLetters, currentWord.word, setLetterOnBoard]);
 
-  const addLetterGuess = (keyObj: KeyObjBase) => {
-    if (selectedLetters.length >= 6) {
-      return;
-    }
-    setSelectedLetters((prev) => [...prev, keyObj]);
-  };
+  const addLetterGuess = useCallback((keyObj: KeyObjBase) => {
+    setSelectedLetters((prev) => {
+      if (prev.length >= 6) return prev;
+      return [...prev, keyObj];
+    });
+  }, []);
 
   const keyboardClick = (keyObj: KeyObjBase) => {
     const letterType = keyObj.type as LetterKeyType;
@@ -77,21 +79,21 @@ export default function VirtualKeyboard({
     checkWord();
   }, [currentWord.guesses]);
 
-  return (
-    <div>
-      {keyboard.map((keyboardRow, rowIdx) => (
-        <div
-          className="my-1.5"
-          key={rowIdx}>
-          {keyboardRow.map((keyObj) => (
-            <KeyboardLetter
-              keyObj={keyObj}
-              callback={keyboardClick}
-              key={keyObj.key}
-            />
-          ))}
-        </div>
-      ))}
-    </div>
-  );
+  const memoizedKeyboard = useMemo(() => {
+    return keyboard.map((keyboardRow, rowIdx) => (
+      <div
+        className="my-1.5"
+        key={rowIdx}>
+        {keyboardRow.map((keyObj) => (
+          <KeyboardLetter
+            keyObj={keyObj}
+            callback={keyboardClick}
+            key={`${rowIdx}-${keyObj.key}`} // more unique key helps React diffing
+          />
+        ))}
+      </div>
+    ));
+  }, [keyboard, keyboardClick]);
+
+  return <div>{memoizedKeyboard}</div>;
 }

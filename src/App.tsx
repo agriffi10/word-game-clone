@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import GameBoard from "./features/game-board/GameBoard";
 import VirtualKeyboard from "./features/virtual-keyboard/VirtualKeyboard";
@@ -27,56 +27,52 @@ function App() {
   const [showDirections, setShowDirections] = useToggle(true);
   const [showFinishedWords, setShowFinishedWords] = useToggle(false);
 
-  const getCurrentGuessWord = () => {
-    return currentGuess.map((x) => x.key).join("");
-  };
+  const currentGuessWord = useMemo(() => currentGuess.map((x) => x.key).join(""), [currentGuess]);
 
   const hasWon = () => {
-    return getCurrentGuessWord() == currentWord.word;
+    return currentGuessWord == currentWord.word;
   };
 
-  const enterLetter = (letter: KeyObjBase) => {
-    if (currentGuess.length >= currentWord.word.length || hasFinished) {
-      return;
-    }
-    const newArray = [...currentGuess, letter];
-    setCurrentGuess(() => newArray);
-  };
+  const enterLetter = useCallback(
+    (letter: KeyObjBase) => {
+      if (currentGuess.length >= currentWord.word.length || hasFinished) return;
+      setCurrentGuess((prev) => [...prev, letter]);
+    },
+    [currentGuess.length, currentWord.word.length, hasFinished],
+  );
 
-  const deleteLetter = () => {
-    if (currentGuess.length == 0 || hasFinished) {
-      setCurrentGuess(() => []);
+  const deleteLetter = useCallback(() => {
+    if (currentGuess.length === 0 || hasFinished) {
+      setCurrentGuess([]);
       return;
     }
-    const newArray = currentGuess.slice(0, -1);
-    setCurrentGuess(() => newArray);
-  };
+    setCurrentGuess((prev) => prev.slice(0, -1));
+  }, [currentGuess.length, hasFinished]);
 
-  const enterGuess = () => {
-    if (hasFinished) {
-      return;
-    }
-    const isValid = validateGuess();
-    if (!isValid) {
+  const enterGuess = useCallback(() => {
+    if (hasFinished) return;
+    if (!validateGuess()) {
       console.log("Guess word is not valid");
       return;
     }
     setCurrentRow((prev) => prev + 1);
-    const updateWord = JSON.parse(JSON.stringify(currentWord));
-    updateWord.guesses.push(getCurrentGuessWord());
-    updateWordInMemory(null, updateWord);
-    setCurrentWord(updateWord);
-  };
+    const updatedWord = {
+      ...currentWord,
+      guesses: [...currentWord.guesses, currentGuessWord],
+    };
+    updateWordInMemory(null, updatedWord);
+    setCurrentWord(updatedWord);
+  }, [currentWord, hasFinished, currentGuess, wordsList]);
+
+  const resetGuess = useCallback(() => {
+    setCurrentGuess([]);
+  }, []);
 
   const validateGuess = () => {
     if (currentGuess.length < 6) {
       return false;
     }
-    return wordsList.some((wordObj) => wordObj.word == getCurrentGuessWord());
-  };
-
-  const resetGuess = () => {
-    setCurrentGuess(() => []);
+    return wordsList.some((wordObj) => wordObj.word == currentGuessWord);
   };
 
   const endTheGame = () => {
@@ -188,7 +184,7 @@ function App() {
               <GuessesView
                 currentGuess={currentGuess}
                 currentWord={currentWord}
-                guessWord={getCurrentGuessWord()}
+                guessWord={currentGuessWord}
               />
             </section>
 

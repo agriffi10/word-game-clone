@@ -1,6 +1,7 @@
+import React from "react";
 import { LetterBoxBaseProps } from "../../typing/components/ComponentProps";
 
-export default function LetterBoxBase({ letter }: LetterBoxBaseProps) {
+function LetterBoxBase({ letter }: LetterBoxBaseProps) {
   return (
     <div
       className={`shadow-thin sm:shadow-thick relative mx-1.5 aspect-square flex-auto overflow-hidden p-1 transition-colors duration-700 sm:p-3 ${letter.style}`}>
@@ -10,3 +11,5 @@ export default function LetterBoxBase({ letter }: LetterBoxBaseProps) {
     </div>
   );
 }
+
+export default React.memo(LetterBoxBase);

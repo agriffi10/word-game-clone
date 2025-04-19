@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   cloneBoard,
@@ -20,7 +20,6 @@ export default function GameBoard({
   endTheGame,
 }: GameBoardProps) {
   const [board, setBoard] = useState<Board>(getNewGameBoard());
-  const [currentLetterIdx, setCurrentLetterIdx] = useState(0);
 
   const setLetterOnBoard = () => {
     const defaultStyle = "bg-gray-300";
@@ -45,8 +44,7 @@ export default function GameBoard({
     setBoard(newBoard);
   };
 
-  const getUpdatedBoard = (coordinates: LetterBoxBaseType[]): Board => {
-    const newBoard = cloneBoard(board);
+  const getUpdatedBoard = (newBoard: Board, coordinates: LetterBoxBaseType[]): Board => {
     for (let i = 0; i < coordinates.length; i++) {
       const letterObj = coordinates[i];
       const rowIdx = letterObj.location[0];
@@ -66,7 +64,7 @@ export default function GameBoard({
       letterObj.style = determineLetterStyle(currentWord.word, letter, i, letterObj.style);
       coordinates.push(letterObj);
     }
-    const newKeyboard = getUpdatedBoard(coordinates);
+    const newKeyboard = getUpdatedBoard(newBoard, coordinates);
     setBoard(newKeyboard);
     if (
       currentRowIdx > MAX_ROW_INDEX ||
@@ -78,26 +76,16 @@ export default function GameBoard({
     }
   };
 
-  const getGuess = (boardRowIdx: number): string => {
-    if (boardRowIdx > currentRowIdx) {
-      return "No guess yet!";
-    }
-    if (boardRowIdx == currentRowIdx) {
-      if (currentGuess.length == 0) {
-        return "No guess yet!";
-      }
-      return currentGuess.map((x) => x.key).join("");
-    }
-    const guess = currentWord.guesses[boardRowIdx] || "";
-    return guess.toUpperCase();
+  const getGuess = (rowIdx: number): string => {
+    if (rowIdx > currentRowIdx) return "No guess yet!";
+    if (rowIdx == currentRowIdx && currentGuess.length === 0) return "No guess yet!";
+    return rowIdx == currentRowIdx
+      ? currentGuess.map((x) => x.key).join("")
+      : (currentWord.guesses[rowIdx] || "").toUpperCase();
   };
 
   useEffect(() => {
     setLetterOnBoard();
-  }, [currentLetterIdx]);
-
-  useEffect(() => {
-    setCurrentLetterIdx(currentGuess.length);
   }, [currentGuess]);
 
   useEffect(() => {
@@ -111,23 +99,27 @@ export default function GameBoard({
     setBoard(getNewGameBoard());
   }, [currentWord.word]);
 
-  return (
-    <div className="mx-auto flex w-full flex-wrap">
-      {board.map((boardRow, arrIndex) => (
+  const renderedBoard = useMemo(() => {
+    return board.map((boardRow, rowIdx) => {
+      const renderedRow = boardRow.map((letter, letterIdx) => (
+        <LetterBoxBase
+          key={`${rowIdx}-${letterIdx}`}
+          letter={letter}
+        />
+      ));
+
+      return (
         <section
-          aria-label={`Guess ${arrIndex + 1} - ${getGuess(arrIndex)}`}
+          key={rowIdx}
+          className="my-1 mb-2 flex w-full justify-around"
+          aria-label={`Guess ${rowIdx + 1} - ${getGuess(rowIdx)}`}
           aria-live="polite"
-          aria-relevant="additions"
-          key={arrIndex}
-          className="my-1 mb-2 flex w-full justify-around">
-          {boardRow.map((letter, letterIdx) => (
-            <LetterBoxBase
-              key={arrIndex.toString() + letterIdx}
-              letter={letter}
-            />
-          ))}
+          aria-relevant="additions">
+          {renderedRow}
         </section>
-      ))}
-    </div>
-  );
+      );
+    });
+  }, [board, currentGuess, currentRowIdx]);
+
+  return <div className="mx-auto flex w-full flex-wrap">{renderedBoard}</div>;
 }
