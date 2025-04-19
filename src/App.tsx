@@ -110,7 +110,6 @@ function App() {
     const currentWord = data.find((wordObj) => wordObj.currentWord == true);
     if (currentWord) {
       const updatedWord = { ...currentWord, guesses: [] };
-      console.log("Word already used today: ", updatedWord.word);
       setCurrentWord(updatedWord);
       return;
     }

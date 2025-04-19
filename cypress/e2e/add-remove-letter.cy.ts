@@ -18,6 +18,15 @@ describe("Add and Remove Letters from the game board.", () => {
   });
 
   it("Should add letters to first guess row", () => {
-    cy.get('[data-cy="keyboard-button"]').first().click();
+    const letter = "Q";
+    const letterKey = cy.contains("Q").first();
+    letterKey.click();
+    const firstGuessRow = cy.getBySel("guess-row").first();
+    firstGuessRow.should("have.text", letter);
+    for (let i = 0; i < 7; i++) {
+      letterKey.click();
+    }
+    const secondGUessRow = cy.getBySel("guess-row").eq(1);
+    secondGUessRow.should("not.have.value", letter);
   });
 });

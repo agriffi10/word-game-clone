@@ -111,6 +111,7 @@ export default function GameBoard({
       return (
         <section
           key={rowIdx}
+          data-cy="guess-row"
           className="my-1 mb-2 flex w-full justify-around"
           aria-label={`Guess ${rowIdx + 1} - ${getGuess(rowIdx)}`}
           aria-live="polite"
