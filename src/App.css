@@ -24,28 +24,7 @@ main {
   margin: auto;
 }
 
-
-.stage {
-  position: relative;
+/* styles.css or a btn.css imported into your app */
+.btn-animate {
+  @apply  active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-150 ease-in-out;
 }
-
-.scene {
-  transition: .5s ease;
-}
-
-.scene.move-right,
-.scene.move-left {
-  position: absolute;
-  visibility: hidden;
-  user-select: none;
-  height:0;
-  overflow: hidden;
-}
-.scene.move-right {
-  transform: translateX(-1000%);
-
-}
-.scene.move-left {
-  transform: translateX(1000%);
-}
-

@@ -8,8 +8,6 @@
     "build": "tsc && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run --coverage",
-    "test:watch": "vitest watch --coverage --disable-console-intercept",
     "cypress": "cypress open",
     "e2e": "cypress run",
     "format": "npx prettier . --check",
