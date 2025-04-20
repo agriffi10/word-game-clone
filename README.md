@@ -1,16 +1,12 @@
-# React Starter
+# Word Game
 
-This template repository is meant to serve as a starter for a React based microservice. It uses React + Vite + Typescript.
+This is a clone of a popular word game. This was a learning experience to build something more complex than just UI components on a site. There is a lot more interactivity between components in a game context than a typical UI (though I've definitely worked on equally complicated UI situations).
 
-## Getting Started
-
-Coming Soon!
+[Live Site] (https://agriffith-word-game.netlify.app/)
 
 ## Tooling
 
-Coming soon!
-
-## Contributing
-
-Coming Soon!
-
+- Vite + React
+- TypeScript
+- Cypress
+- TailwindCSS
