@@ -158,11 +158,11 @@ function App() {
 
   return (
     <div className="bg-accent flex h-screen w-screen items-center justify-center overflow-auto p-2 text-center sm:p-5">
-      <main className="mx-auto w-full">
+      <main className="m-auto flex w-full flex-grow flex-col items-center justify-center">
         <div className="flex w-full">
           <BoardWrapper>
             <h1 className="mb-2 text-4xl text-white">Word Game</h1>
-            <section>
+            <section aria-label="Guesses">
               <GameBoard
                 currentRowIdx={currentRow}
                 currentGuess={currentGuess}
@@ -171,7 +171,7 @@ function App() {
                 endTheGame={endTheGame}
               />
             </section>
-            <section>
+            <section aria-label="Keyboard Input">
               <VirtualKeyboard
                 enterGuess={enterGuess}
                 enterLetter={enterLetter}
@@ -179,7 +179,7 @@ function App() {
                 currentWord={currentWord}
               />
             </section>
-            <section>
+            <section aria-label="Guess Information">
               <GuessesView
                 currentGuess={currentGuess}
                 currentWord={currentWord}
