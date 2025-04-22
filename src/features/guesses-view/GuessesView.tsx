@@ -28,7 +28,7 @@ export default function GuessesView({ currentGuess, currentWord, guessWord }: Gu
         <h4 className="font-bold">Current Guess</h4>
         <div className="min-h-[24px]">
           {currentGuess.length == 0 && <p>No guess yet!</p>}
-          {currentGuess.length > 0 && <p>{guessWord.toUpperCase()}</p>}
+          {currentGuess.length > 0 && <p data-cy="current-guess">{guessWord.toUpperCase()}</p>}
         </div>
       </div>
       <div
@@ -40,7 +40,11 @@ export default function GuessesView({ currentGuess, currentWord, guessWord }: Gu
           {currentWord.guesses.length > 0 && (
             <ul>
               {currentWord.guesses.map((x, index) => (
-                <li key={x + index}>{x.toUpperCase()}</li>
+                <li
+                  data-cy="guesses"
+                  key={x + index}>
+                  {x.toUpperCase()}
+                </li>
               ))}
             </ul>
           )}
@@ -53,7 +57,9 @@ export default function GuessesView({ currentGuess, currentWord, guessWord }: Gu
         aria-relevant="additions">
         <h4 className="font-bold">Matched Letters</h4>
         <div className="min-h-[24px]">
-          <p>{getMatchedLetters(currentWord.word, currentWord.guesses)}</p>
+          <p data-cy="matched-letters">
+            {getMatchedLetters(currentWord.word, currentWord.guesses)}
+          </p>
         </div>
       </div>
     </div>
