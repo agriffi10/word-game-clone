@@ -26,6 +26,7 @@ function KeyboardLetter({ keyObj, callback }: KeyboardLetterProps) {
   return (
     <button
       key={letter}
+      id={letter}
       type="button"
       data-cy="keyboard-button"
       className={`shadow-thin sm:shadow-thick btn-animate xs:h-10 xs:w-10 mx-1 my-1 h-6.5 w-6.5 transform cursor-pointer rounded-md bg-gray-200 text-black sm:mx-1.5 ${keyObj.style}`}

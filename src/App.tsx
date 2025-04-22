@@ -11,6 +11,7 @@ import GuessesView from "./features/guesses-view/GuessesView";
 import PastWords from "./features/past-words/PastWords";
 import { KeyDataArray, KeyObjBase, WordData } from "./typing/components/BaseTypes";
 import Modal from "./components/modal/Modal";
+import { ToastContainer, toast, Bounce } from "react-toastify";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -28,10 +29,23 @@ function App() {
   const [showFinishedWords, setShowFinishedWords] = useToggle(false);
 
   const currentGuessWord = useMemo(() => currentGuess.map((x) => x.key).join(""), [currentGuess]);
+  const toastLabel = "User Alert";
 
   const hasWon = () => {
     return currentGuessWord == currentWord.word;
   };
+
+  const notifyWordInvalid = useCallback((message: string) => {
+    toast.warn(message, {
+      ariaLabel: toastLabel,
+      onClose: () => {
+        const enterGuess = document.getElementById("ENTER GUESS");
+        if (enterGuess) {
+          enterGuess.focus();
+        }
+      },
+    });
+  }, []);
 
   const enterLetter = useCallback(
     (letter: KeyObjBase) => {
@@ -52,7 +66,6 @@ function App() {
   const enterGuess = useCallback(() => {
     if (hasFinished) return;
     if (!validateGuess()) {
-      console.log("Guess word is not valid");
       return;
     }
     setCurrentRow((prev) => prev + 1);
@@ -72,7 +85,11 @@ function App() {
     if (currentGuess.length < 6) {
       return false;
     }
-    return wordsList.some((wordObj) => wordObj.word == currentGuessWord);
+    const isInList = wordsList.some((wordObj) => wordObj.word == currentGuessWord);
+    if (!isInList) {
+      notifyWordInvalid("Guess word is not in word list!");
+    }
+    return isInList;
   };
 
   const endTheGame = () => {
@@ -176,6 +193,7 @@ function App() {
                 enterGuess={enterGuess}
                 enterLetter={enterLetter}
                 deleteLetter={deleteLetter}
+                notify={notifyWordInvalid}
                 currentWord={currentWord}
               />
             </section>
@@ -204,7 +222,6 @@ function App() {
             {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
           </BoardWrapper>
         </div>
-
         <Modal show={showEndModal}>
           <div className="text-left text-white">
             <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
@@ -248,6 +265,19 @@ function App() {
             setShowFinishedWords={setShowFinishedWords}
           />
         </Modal>
+        <ToastContainer
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={true}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          transition={Bounce}
+        />{" "}
       </main>
     </div>
   );

@@ -39,6 +39,7 @@ declare global {
       getBySel(selector: string): Chainable<JQuery<HTMLElement>>;
       getKeyboardLetter(letter: string): Chainable<JQuery<HTMLElement>>;
       enterWord(guess: string): void;
+      getToastAlert(selector: string): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
@@ -57,4 +58,8 @@ Cypress.Commands.add("enterWord", (guess) => {
     cy.getKeyboardLetter(letter).click();
     cy.wait(100);
   }
+});
+
+Cypress.Commands.add("getToastAlert", (selector) => {
+  return cy.get(`[aria-label="${selector}"]`);
 });

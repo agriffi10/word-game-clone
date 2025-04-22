@@ -12,6 +12,7 @@ export default function VirtualKeyboard({
   enterLetter,
   deleteLetter,
   enterGuess,
+  notify,
   currentWord,
 }: VirtualKeyboardProps) {
   const [keyboard, setKeyBoard] = useState<Keyboard>(getDefaultKeyboard());
@@ -54,6 +55,12 @@ export default function VirtualKeyboard({
       return [...prev, keyObj];
     });
   }, []);
+  const removeLetterGuess = useCallback(() => {
+    setSelectedLetters((prev) => {
+      if (prev.length == 0) return prev;
+      return prev.slice(0, -1);
+    });
+  }, []);
 
   const keyboardClick = (keyObj: KeyObjBase) => {
     const letterType = keyObj.type as LetterKeyType;
@@ -61,9 +68,11 @@ export default function VirtualKeyboard({
       addLetterGuess(keyObj);
       enterLetter(keyObj);
     } else if (letterType == LetterKeyType.DELETE) {
+      removeLetterGuess();
       deleteLetter();
     } else if (letterType == LetterKeyType.ENTER) {
       if (selectedLetters.length !== currentWord.word.length) {
+        notify("Current guess is less than six letters!");
         return;
       }
       enterGuess();
