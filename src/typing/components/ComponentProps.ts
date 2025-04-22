@@ -25,6 +25,7 @@ export interface VirtualKeyboardProps {
   currentWord: WordData;
   enterLetter: (letter: KeyObjBase) => void;
   deleteLetter: () => void;
+  notify: (message: string) => void;
   enterGuess: () => void;
 }
 
