@@ -29,13 +29,22 @@ function App() {
   const [showFinishedWords, setShowFinishedWords] = useToggle(false);
 
   const currentGuessWord = useMemo(() => currentGuess.map((x) => x.key).join(""), [currentGuess]);
+  const toastLabel = "User Alert";
 
   const hasWon = () => {
     return currentGuessWord == currentWord.word;
   };
 
-  const notify = useCallback((message: string) => {
-    toast.warn(message);
+  const notifyWordInvalid = useCallback((message: string) => {
+    toast.warn(message, {
+      ariaLabel: toastLabel,
+      onClose: () => {
+        const enterGuess = document.getElementById("ENTER GUESS");
+        if (enterGuess) {
+          enterGuess.focus();
+        }
+      },
+    });
   }, []);
 
   const enterLetter = useCallback(
@@ -74,12 +83,11 @@ function App() {
 
   const validateGuess = () => {
     if (currentGuess.length < 6) {
-      notify("Guess word is not long enough!");
       return false;
     }
     const isInList = wordsList.some((wordObj) => wordObj.word == currentGuessWord);
     if (!isInList) {
-      notify("Guess word is not word list!");
+      notifyWordInvalid("Guess word is not in word list!");
     }
     return isInList;
   };
@@ -185,7 +193,7 @@ function App() {
                 enterGuess={enterGuess}
                 enterLetter={enterLetter}
                 deleteLetter={deleteLetter}
-                notify={notify}
+                notify={notifyWordInvalid}
                 currentWord={currentWord}
               />
             </section>
