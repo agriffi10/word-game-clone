@@ -80,7 +80,10 @@ export default function GameBoard({
     if (rowIdx > currentRowIdx) return "No guess yet!";
     if (rowIdx == currentRowIdx && currentGuess.length === 0) return "No guess yet!";
     return rowIdx == currentRowIdx
-      ? currentGuess.map((x) => x.key).join("")
+      ? currentGuess
+          .map((x) => x.key)
+          .join("")
+          .toUpperCase()
       : (currentWord.guesses[rowIdx] || "").toUpperCase();
   };
 

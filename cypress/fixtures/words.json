@@ -1,0 +1,9 @@
+[
+  { "word": "banana", "isSolved": false, "guesses": [], "currentWord": true },
+  { "word": "puzzle", "isSolved": false, "guesses": [], "currentWord": false },
+  { "word": "marble", "isSolved": false, "guesses": [], "currentWord": false },
+  { "word": "orange", "isSolved": false, "guesses": [], "currentWord": false },
+  { "word": "guitar", "isSolved": false, "guesses": [], "currentWord": false },
+  { "word": "breeze", "isSolved": false, "guesses": [], "currentWord": false },
+  { "word": "silent", "isSolved": false, "guesses": [], "currentWord": false }
+]

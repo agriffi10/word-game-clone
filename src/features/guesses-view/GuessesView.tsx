@@ -21,39 +21,45 @@ export default function GuessesView({ currentGuess, currentWord, guessWord }: Gu
   };
   return (
     <div className="my-4 flex w-full justify-evenly text-center text-xs text-white sm:my-2 sm:text-base">
-      <div className="px-2">
+      <div
+        className="px-2"
+        aria-live="polite"
+        aria-relevant="additions removals">
         <h4 className="font-bold">Current Guess</h4>
-        <div
-          aria-live="polite"
-          aria-relevant="additions removals"
-          className="min-h-[24px]">
+        <div className="min-h-[24px]">
           {currentGuess.length == 0 && <p>No guess yet!</p>}
-          {currentGuess.length > 0 && <p>{guessWord.toUpperCase()}</p>}
+          {currentGuess.length > 0 && <p data-cy="current-guess">{guessWord.toUpperCase()}</p>}
         </div>
       </div>
-      <div className="px-2">
+      <div
+        className="px-2"
+        aria-live="polite"
+        aria-relevant="additions">
         <h4 className="font-bold">All Guesses</h4>
-        <div
-          aria-live="polite"
-          aria-relevant="additions"
-          className="min-h-[24px]">
+        <div className="min-h-[24px]">
           {currentWord.guesses.length > 0 && (
             <ul>
               {currentWord.guesses.map((x, index) => (
-                <li key={x + index}>{x.toUpperCase()}</li>
+                <li
+                  data-cy="guesses"
+                  key={x + index}>
+                  {x.toUpperCase()}
+                </li>
               ))}
             </ul>
           )}
           {currentWord.guesses.length == 0 && <p>No guesses yet!</p>}
         </div>
       </div>
-      <div className="px-2">
+      <div
+        className="px-2"
+        aria-live="polite"
+        aria-relevant="additions">
         <h4 className="font-bold">Matched Letters</h4>
-        <div
-          aria-live="polite"
-          aria-relevant="additions"
-          className="min-h-[24px]">
-          <p>{getMatchedLetters(currentWord.word, currentWord.guesses)}</p>
+        <div className="min-h-[24px]">
+          <p data-cy="matched-letters">
+            {getMatchedLetters(currentWord.word, currentWord.guesses)}
+          </p>
         </div>
       </div>
     </div>

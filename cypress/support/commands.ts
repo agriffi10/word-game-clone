@@ -36,11 +36,30 @@ declare global {
        * @param selector - The data-cy attribute value.
        * @param args - Additional arguments for the cy.get command.
        */
-      getBySel(selector: string, ...args: any[]): Chainable<JQuery<HTMLElement>>;
+      getBySel(selector: string): Chainable<JQuery<HTMLElement>>;
+      getKeyboardLetter(letter: string): Chainable<JQuery<HTMLElement>>;
+      enterWord(guess: string): void;
+      getToastAlert(selector: string): Chainable<JQuery<HTMLElement>>;
     }
   }
 }
 
-Cypress.Commands.add("getBySel", (selector, ...args) => {
-  return cy.get(`[data-cy=${selector}]`, ...args);
+Cypress.Commands.add("getBySel", (selector) => {
+  return cy.get(`[data-cy=${selector}]`);
+});
+
+Cypress.Commands.add("getKeyboardLetter", (letter) => {
+  return cy.getBySel("keyboard-button").contains(letter);
+});
+
+Cypress.Commands.add("enterWord", (guess) => {
+  for (let i = 0; i < guess.length; i++) {
+    const letter = guess[i];
+    cy.getKeyboardLetter(letter).click();
+    cy.wait(100);
+  }
+});
+
+Cypress.Commands.add("getToastAlert", (selector) => {
+  return cy.get(`[aria-label="${selector}"]`);
 });
