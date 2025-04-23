@@ -1,6 +1,6 @@
 # Word Game
 
-This project is a clone of a popular word game. 
+This project is a clone of a popular word game.
 
 It was a great learning experience to build something more complex than just UI components on a site. There is more interactivity between elements in a game context than in a typical UI, though I've worked on equally complicated UI situations.
 
@@ -78,7 +78,8 @@ This would live at the path `/{user}/stats/stat.json` and it would contain a JSO
   }
 }]
 ```
-The stats JSON would get updated at the end of each game when a user either solves the word or exhausts all their guesses. If they solve the word, the `currentWinStreak` will be incremented by 1, or if they fail to solve a word it would reset to zero. The `totalWordsPlayed` and `totalWordsSolved` would need to be calculated from the word storage of the given user. 
+
+The stats JSON would get updated at the end of each game when a user either solves the word or exhausts all their guesses. If they solve the word, the `currentWinStreak` will be incremented by 1, or if they fail to solve a word it would reset to zero. The `totalWordsPlayed` and `totalWordsSolved` would need to be calculated from the word storage of the given user.
 
 #### Word Storage
 
@@ -91,4 +92,4 @@ Whenever a user submits their first guess for a word they haven't interacted wit
 }]
 ```
 
-would be created under the path `/{user}/{word}/data.json`. Anytime a guess is submitted, it would update this JSON object in the user data storage. When the application first loads, it would use the current word in an API that would pull the JSON object if it existed and be loaded into the UI state. As the object got updated, it would write back to the user storage for the given word. The `didSolve` property would only update if a user correctly guessed the word for the given day they have selected. Non-logged in users would only have the current day's word JSON stored in localStorage.
+would be created under the path `/{user}/{word}/data.json`. Anytime a guess is submitted, it would update this JSON object in the user data storage. When the application first loads, it would use the current word in an API that would pull the JSON object if it existed and be loaded into the UI state. As the object got updated, it would write back to the user storage for the given word. The `didSolve` property would only update if a user correctly guessed the word for the given day they have selected. Users not logged in would only have the current day's word JSON stored in localStorage.
