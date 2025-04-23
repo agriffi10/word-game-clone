@@ -57,6 +57,27 @@ Each logged in user would have a path at `user-data/{username}`. This path would
 - `/stats`
 - `/words/{word}`
 
+If a user was not logged in, then I would change the localStorage structure to mimic this pattern.
+
 #### Stats Storage
+
+This would live at the path `/{user}/stats/stat.json` and it would contain a JSON object with the following structure:
+
+```
+[{
+  "totalWordsPlayed": 0,
+  "totalWordsSolved": 0,
+  "currentWinStreak": 0,
+  "guessesCountToWin: {
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0
+      "6": 0
+  }
+}]
+```
+The stats JSON would get updated at the end of each game when a user either solves the word or exhausts all their guesses. If they solve the word, the `currentWinStreak` will be incremented by 1, or if they fail to solve a word it would reset to zero. The `totalWordsPlayed` and `totalWordsSolved` would need to be calculated from the word storage of the given user.
 
 #### Word Storage
