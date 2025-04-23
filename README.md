@@ -42,7 +42,7 @@ Creating an account would be optional for the user, but creating an account woul
 
 ![word-game-table](https://github.com/user-attachments/assets/97b6ac93-24f0-4c37-bd59-e01262bd1356)
 
-Using Postgres in Supabase, I'd create a table that housed all the words, along with the date they were used. From the UI, instead of loading a list of words, it would make an API call to get the word for the current day.
+Using Postgres in Supabase, I'd create a table that housed all the words, along with the date they were used. From the UI, instead of loading a list of words, it would make an API call to get the word for the current day. A date selector would be added to allow users to pick new word once the current day's word had been solved.
 
 When a user submits a guess, the UI would make an API call to check if the word existed in the table as the simplest form of validation for valid, six letter english words.
 
@@ -50,20 +50,18 @@ If a guess is valid, it would get stored in the user Blob Storage for that user 
 
 ### User Blob Storage
 
-Instead of creating many entries in a table to store user guesses and stats, I'd generate JSON files for each user in blob storage. 
+Instead of creating many entries in a table to store user guesses and stats, I'd generate JSON files for each user in blob storage. If a user was not logged in, then I would change the localStorage structure to mimic this pattern for the words only. Users without an account do not receive stats at the end of each round, and they couldn't change the day to select a new word.
 
 Each logged in user would have a path at `user-data/{username}`. This path would have two subfolder keys:
 
 - `/stats`
 - `/words/{word}`
 
-If a user was not logged in, then I would change the localStorage structure to mimic this pattern.
-
 #### Stats Storage
 
 This would live at the path `/{user}/stats/stat.json` and it would contain a JSON object with the following structure:
 
-```
+```json
 [{
   "totalWordsPlayed": 0,
   "totalWordsSolved": 0,
@@ -78,6 +76,6 @@ This would live at the path `/{user}/stats/stat.json` and it would contain a JSO
   }
 }]
 ```
-The stats JSON would get updated at the end of each game when a user either solves the word or exhausts all their guesses. If they solve the word, the `currentWinStreak` will be incremented by 1, or if they fail to solve a word it would reset to zero. The `totalWordsPlayed` and `totalWordsSolved` would need to be calculated from the word storage of the given user.
+The stats JSON would get updated at the end of each game when a user either solves the word or exhausts all their guesses. If they solve the word, the `currentWinStreak` will be incremented by 1, or if they fail to solve a word it would reset to zero. The `totalWordsPlayed` and `totalWordsSolved` would need to be calculated from the word storage of the given user. 
 
 #### Word Storage
