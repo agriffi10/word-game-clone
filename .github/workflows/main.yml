@@ -25,7 +25,7 @@ jobs:
         run: supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Link to your Supabase project
-        run: supabase link --project-ref your-project-ref
+        run: supabase link --project-ref suwukrlnkhxsprnroeay
 
       - name: Deploy Supabase
         run: supabase db push
