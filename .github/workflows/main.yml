@@ -22,10 +22,10 @@ jobs:
         run: npm install supabase
 
       - name: Authenticate with Supabase
-        run: supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: npx supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Link to your Supabase project
-        run: supabase link --project-ref suwukrlnkhxsprnroeay
+        run: npx supabase link --project-ref suwukrlnkhxsprnroeay
 
       - name: Deploy Supabase
-        run: supabase db push
+        run: npx supabase db push
