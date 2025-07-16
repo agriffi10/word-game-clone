@@ -12,6 +12,7 @@ import PastWords from "./features/past-words/PastWords";
 import { KeyDataArray, KeyObjBase, WordData } from "./typing/components/BaseTypes";
 import Modal from "./components/modal/Modal";
 import { ToastContainer, toast, Bounce } from "react-toastify";
+import supabase from "./api/client/SupabaseClient";
 
 function App() {
   const [hasFinished, setHasFinished] = useState(false);
@@ -65,31 +66,39 @@ function App() {
 
   const enterGuess = useCallback(() => {
     if (hasFinished) return;
-    if (!validateGuess()) {
-      return;
-    }
-    setCurrentRow((prev) => prev + 1);
-    const updatedWord = {
-      ...currentWord,
-      guesses: [...currentWord.guesses, currentGuessWord],
-    };
-    updateWordInMemory(null, updatedWord);
-    setCurrentWord(updatedWord);
-  }, [currentWord, hasFinished, currentGuess, wordsList]);
+    validateGuess();
+  }, [currentGuess]);
 
   const resetGuess = useCallback(() => {
     setCurrentGuess([]);
   }, []);
 
-  const validateGuess = () => {
+  const validateGuess = async () => {
     if (currentGuess.length < 6) {
       return false;
     }
-    const isInList = wordsList.some((wordObj) => wordObj.word == currentGuessWord);
-    if (!isInList) {
-      notifyWordInvalid("Guess word is not in word list!");
+    const { data, error } = await supabase
+      .from("all_words")
+      .select("word") // Select only the column you need to verify
+      .eq("word", currentGuessWord)
+      .limit(1);
+    if (error) {
+      notifyWordInvalid(`Error checking word: ${error.message}`);
+      return;
     }
-    return isInList;
+    if (data.length < 1) {
+      notifyWordInvalid("Word not valid!");
+    } else {
+      setCurrentRow((prev) => prev + 1);
+      const updatedWord = {
+        ...currentWord,
+        guesses: [...currentWord.guesses, currentGuessWord],
+      };
+      updateWordInMemory(null, updatedWord);
+      setCurrentWord(() => ({
+        ...updatedWord,
+      }));
+    }
   };
 
   const endTheGame = () => {
