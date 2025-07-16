@@ -24,6 +24,6 @@ describe("Alerting on invalid guesses.", () => {
     cy.wait(100);
     cy.getToastAlert("User Alert")
       .should("exist")
-      .should("contain.text", "Guess word is not in word list!");
+      .should("contain.text", "Word not valid!");
   });
 });
