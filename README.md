@@ -20,6 +20,7 @@ A list of technology I used to build this app:
 
 This is a basic React app with TailwindCSS for styling. I've grown to prefer TailwindCSS because writing CSS for trivial positioning is mentally taxing. Unless I'm doing something specific and complex, though I've learned through this project you can create a class that encapsulates several Tailwind classes, I don't like writing bespoke CSS or my own responsive queries. Tailwind is enough to capture 99% of my use cases in this app.
 
+
 I intentionally did not unit test this codebase and instead opted for Cypress end-to-end tests. There are a few spots where unit tests would be helpful, but given the integrations between all the components, I felt that Cypress covered all of my use cases. It's integrated into my build pipeline as well through Netlify, so it will have to run and pass before each deploy.
 
 ## How It Works
