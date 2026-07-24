@@ -22,8 +22,6 @@ describe("Alerting on invalid guesses.", () => {
     const enterButton = cy.contains("ENTER GUESS");
     enterButton.click();
     cy.wait(100);
-    cy.getToastAlert("User Alert")
-      .should("exist")
-      .should("contain.text", "Word not valid!");
+    cy.getToastAlert("User Alert").should("exist").should("contain.text", "Word not valid!");
   });
 });
