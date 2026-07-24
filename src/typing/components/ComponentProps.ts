@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { KeyObjBase, WordData, LetterBoxBaseType, KeyDataArray } from "./BaseTypes";
+import { KeyObjBase, GameState, PlayedWord, LetterBoxBaseType, KeyDataArray } from "./BaseTypes";
 
 export type BoardWrapperProps = {
   children: React.ReactNode | React.ReactNode[];
@@ -8,7 +8,7 @@ export type BoardWrapperProps = {
 
 type BaseGameplayComponentProps = {
   currentGuess: KeyDataArray;
-  currentWord: WordData;
+  currentWord: GameState;
 };
 
 export interface GameBoardProps extends BaseGameplayComponentProps {
@@ -22,7 +22,7 @@ export interface GuessesViewProps extends BaseGameplayComponentProps {
 }
 
 export interface VirtualKeyboardProps {
-  currentWord: WordData;
+  currentWord: GameState;
   enterLetter: (letter: KeyObjBase) => void;
   deleteLetter: () => void;
   notify: (message: string) => void;
@@ -39,16 +39,8 @@ export type LetterBoxBaseProps = {
 };
 
 export type PastWordsProps = {
-  wordsList: WordData[];
+  playedWords: PlayedWord[];
   setShowFinishedWords: () => void;
-};
-
-export type PreviousBoardProps = {
-  wordList: WordData[];
-};
-
-export type PreviousWordProps = {
-  wordObject: WordData;
 };
 
 export type UserActionButtonProps = {

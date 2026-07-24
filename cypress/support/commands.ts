@@ -41,29 +41,14 @@ declare global {
       enterWord(guess: string): void;
       getToastAlert(selector: string): Chainable<JQuery<HTMLElement>>;
       /**
-       * Stub the Supabase guess-validation lookup so guess submission works
-       * without a live backend. Call in a spec's `beforeEach` before visiting.
+       * Load the app with the deterministic fixture word list (both the answer
+       * pool and the validation dictionary) and first-word selection, then close
+       * the directions modal. Use in a spec's `beforeEach`.
        */
-      stubWordValidation(): void;
+      startGame(): void;
     }
   }
 }
-
-// Guesses the tests submit that should validate as real words. The app checks
-// each guess against the Supabase `all_words` table, which is unreachable in
-// e2e (dummy creds) — so we stub it: a real word returns one row, anything else
-// (e.g. "qwerty", "qqqqqq") returns none, which the app surfaces as invalid.
-const VALID_WORDS = [
-  "banana",
-  "puzzle",
-  "marble",
-  "orange",
-  "guitar",
-  "breeze",
-  "silent",
-  "saddle",
-  "museum",
-];
 
 Cypress.Commands.add("getBySel", (selector) => {
   return cy.get(`[data-cy=${selector}]`);
@@ -85,12 +70,15 @@ Cypress.Commands.add("getToastAlert", (selector) => {
   return cy.get(`[aria-label="${selector}"]`);
 });
 
-// Intercept GET {SUPABASE_URL}/rest/v1/all_words?word=eq.<word>&... and answer
-// from VALID_WORDS, mirroring the real ".eq('word', guess').limit(1)" lookup.
-Cypress.Commands.add("stubWordValidation", () => {
-  cy.intercept("GET", "**/rest/v1/all_words*", (req) => {
-    const word = new URL(req.url).searchParams.get("word")?.replace(/^eq\./, "").toLowerCase();
-    const isValid = !!word && VALID_WORDS.includes(word);
-    req.reply(isValid ? [{ word }] : []);
-  }).as("validateWord");
+// Serve the fixture as the word list and make selection deterministic by
+// stubbing Math.random to 0, so pickNextWord always returns the first unplayed
+// word (fixture[0] = "banana"). The fixture is also the validation dictionary.
+Cypress.Commands.add("startGame", () => {
+  cy.intercept("GET", "/words.json", { fixture: "words.json" }).as("wordList");
+  cy.visit("/", {
+    onBeforeLoad(win) {
+      cy.stub(win.Math, "random").returns(0);
+    },
+  });
+  cy.contains("Close Directions").click();
 });

@@ -1,8 +1,6 @@
 describe("Alerting on invalid guesses.", () => {
   beforeEach(() => {
-    cy.stubWordValidation();
-    cy.visit("/");
-    cy.contains("Close Directions").click();
+    cy.startGame();
   });
 
   it("Should display an alert when there is not enough characters.", () => {

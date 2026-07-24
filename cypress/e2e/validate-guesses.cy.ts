@@ -2,9 +2,7 @@
 
 describe("Enter guesses on the board.", () => {
   beforeEach(() => {
-    cy.stubWordValidation();
-    cy.visit("/");
-    cy.contains("Close Directions").click();
+    cy.startGame();
   });
 
   it("Should not allow moving to next guess row with invalid word", () => {

@@ -2,8 +2,7 @@
 
 describe("Add and Remove Letters from the game board.", () => {
   beforeEach(() => {
-    cy.visit("/");
-    cy.contains("Close Directions").click();
+    cy.startGame();
   });
 
   it("Should add letters to first guess row", () => {
