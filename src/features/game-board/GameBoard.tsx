@@ -98,8 +98,25 @@ export default function GameBoard({
     updateBoard();
   }, [currentRowIdx]);
 
+  // Rebuild the board whenever the target word changes — a new game, or resuming
+  // a saved game on reload — repainting any already-submitted guesses. This effect
+  // runs last on mount, so it wins over the live-play effects above.
   useEffect(() => {
-    setBoard(getNewGameBoard());
+    const rebuilt = getNewGameBoard();
+    currentWord.guesses.forEach((guess, rowIdx) => {
+      if (rowIdx > MAX_ROW_INDEX) return;
+      for (let i = 0; i <= MAX_LETTER_INDEX; i++) {
+        const letter = guess[i] ?? "";
+        rebuilt[rowIdx][i] = {
+          key: letter,
+          style: letter
+            ? determineLetterStyle(currentWord.word, letter, i, "bg-gray-300")
+            : "bg-gray-300",
+          location: [rowIdx, i],
+        };
+      }
+    });
+    setBoard(rebuilt);
   }, [currentWord.word]);
 
   const renderedBoard = useMemo(() => {

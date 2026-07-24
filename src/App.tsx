@@ -9,32 +9,38 @@ import BoardWrapper from "./components/board-wrapper/BoardWrapper";
 import useToggle from "./hooks/Toggle";
 import GuessesView from "./features/guesses-view/GuessesView";
 import PastWords from "./features/past-words/PastWords";
-import { KeyDataArray, KeyObjBase, WordData } from "./typing/components/BaseTypes";
+import { GameState, KeyDataArray, KeyObjBase, PlayedWord } from "./typing/components/BaseTypes";
 import Modal from "./components/modal/Modal";
 import { ToastContainer, toast, Bounce } from "react-toastify";
-import supabase from "./api/client/SupabaseClient";
+import { buildValidator, isValidGuess, pickNextWord, WORD_LENGTH } from "./utils/WordSelection";
+import {
+  clearLegacyState,
+  loadSession,
+  resetSession,
+  saveSession,
+  SESSION_VERSION,
+} from "./utils/SessionStorage";
+
+const newGame = (word: string): GameState => ({
+  word,
+  guesses: [],
+  currentRow: 0,
+  isFinished: false,
+  isSolved: false,
+});
 
 function App() {
-  const [hasFinished, setHasFinished] = useState(false);
-  const [currentRow, setCurrentRow] = useState(0);
   const [currentGuess, setCurrentGuess] = useState<KeyDataArray>([]);
-  const [currentWord, setCurrentWord] = useState<WordData>({
-    word: "",
-    isSolved: false,
-    guesses: [],
-    currentWord: false,
-  });
-  const [wordsList, setWordsList] = useState<WordData[]>([]);
+  const [wordList, setWordList] = useState<string[]>([]);
+  const [game, setGame] = useState<GameState | null>(null);
+  const [playedWords, setPlayedWords] = useState<PlayedWord[]>([]);
   const [showEndModal, setShowEndModal] = useToggle();
   const [showDirections, setShowDirections] = useToggle(true);
   const [showFinishedWords, setShowFinishedWords] = useToggle(false);
 
+  const validator = useMemo(() => buildValidator(wordList), [wordList]);
   const currentGuessWord = useMemo(() => currentGuess.map((x) => x.key).join(""), [currentGuess]);
   const toastLabel = "User Alert";
-
-  const hasWon = () => {
-    return currentGuessWord == currentWord.word;
-  };
 
   const notifyWordInvalid = useCallback((message: string) => {
     toast.warn(message, {
@@ -50,137 +56,110 @@ function App() {
 
   const enterLetter = useCallback(
     (letter: KeyObjBase) => {
-      if (currentGuess.length >= currentWord.word.length || hasFinished) return;
+      if (!game || game.isFinished) return;
+      if (currentGuess.length >= WORD_LENGTH) return;
       setCurrentGuess((prev) => [...prev, letter]);
     },
-    [currentGuess.length, currentWord.word.length, hasFinished],
+    [game, currentGuess.length],
   );
 
   const deleteLetter = useCallback(() => {
-    if (currentGuess.length === 0 || hasFinished) {
+    if (currentGuess.length === 0 || !game || game.isFinished) {
       setCurrentGuess([]);
       return;
     }
     setCurrentGuess((prev) => prev.slice(0, -1));
-  }, [currentGuess.length, hasFinished]);
-
-  const enterGuess = useCallback(() => {
-    if (hasFinished) return;
-    validateGuess();
-  }, [currentGuess]);
+  }, [currentGuess.length, game]);
 
   const resetGuess = useCallback(() => {
     setCurrentGuess([]);
   }, []);
 
-  const validateGuess = async () => {
-    if (currentGuess.length < 6) {
-      return false;
-    }
-    const { data, error } = await supabase
-      .from("all_words")
-      .select("word") // Select only the column you need to verify
-      .eq("word", currentGuessWord)
-      .limit(1);
-    if (error) {
-      notifyWordInvalid(`Error checking word: ${error.message}`);
+  // Synchronous, local guess validation — the guess is valid iff it is a
+  // six-letter word in the fetched list. On acceptance the guess is recorded and
+  // the row advances; GameBoard then detects win/exhaustion and calls endTheGame.
+  const enterGuess = useCallback(() => {
+    if (!game || game.isFinished) return;
+    if (currentGuessWord.length < WORD_LENGTH) return;
+    if (!isValidGuess(currentGuessWord, validator)) {
+      notifyWordInvalid("Word not valid!");
       return;
     }
-    if (data.length < 1) {
-      notifyWordInvalid("Word not valid!");
-    } else {
-      setCurrentRow((prev) => prev + 1);
-      const updatedWord = {
-        ...currentWord,
-        guesses: [...currentWord.guesses, currentGuessWord],
-      };
-      updateWordInMemory(null, updatedWord);
-      setCurrentWord(() => ({
-        ...updatedWord,
-      }));
-    }
-  };
+    setGame((prev) =>
+      prev
+        ? {
+            ...prev,
+            guesses: [...prev.guesses, currentGuessWord],
+            currentRow: prev.currentRow + 1,
+          }
+        : prev,
+    );
+  }, [game, currentGuessWord, validator, notifyWordInvalid]);
 
   const endTheGame = () => {
-    setHasFinished(true);
-    const newWord = { ...currentWord };
-    newWord.isSolved = true;
-    newWord.currentWord = false;
-    updateWordInMemory(null, newWord);
+    if (!game) return;
+    const solved = game.guesses.includes(game.word);
+    setGame({ ...game, isFinished: true, isSolved: solved });
+    setPlayedWords((prev) =>
+      prev.some((played) => played.word === game.word)
+        ? prev
+        : [...prev, { word: game.word, solved }],
+    );
     setShowEndModal();
   };
 
-  const getGameOverText = () => {
-    if (hasWon()) {
-      return "You won!";
-    }
-    return `Not this time!`;
-  };
+  const getGameOverText = () => (game?.isSolved ? "You won!" : "Not this time!");
 
-  const resetGame = () => {
-    setCurrentRow(0);
+  // Endless play: the next word is any list word not yet played this session.
+  const playAgain = () => {
     resetGuess();
-    setHasFinished(false);
-    getNewWord();
+    const played = playedWords.map((entry) => entry.word);
+    const nextWord = pickNextWord(wordList, played);
+    setGame(nextWord ? newGame(nextWord) : null);
   };
 
-  /**
-   * Description placeholder
-   *
-   * @param {(WordData[] | null)} [data=null]
-   */
-  const getNewWord = (data: WordData[] | null = null) => {
-    if (!data) {
-      data = JSON.parse(JSON.stringify(wordsList)) as WordData[];
-    }
-    const currentWord = data.find((wordObj) => wordObj.currentWord == true);
-    if (currentWord) {
-      const updatedWord = { ...currentWord, guesses: [] };
-      setCurrentWord(updatedWord);
-      return;
-    }
-    const filteredList = data.filter((wordObj) => wordObj.isSolved == false);
-    if (filteredList.length == 0) {
-      console.error("No words available");
-      return;
-    }
-    const wordIndex = Math.floor(Math.random() * filteredList.length);
-    const randomWord = JSON.parse(JSON.stringify(filteredList[wordIndex]));
-    randomWord.currentWord = true;
-    updateWordInMemory(data, randomWord);
-    setCurrentWord(randomWord);
+  // Reset control: clear the persisted session and start a fresh game with the
+  // full list eligible again.
+  const resetGameSession = () => {
+    resetSession();
+    setPlayedWords([]);
+    resetGuess();
+    const nextWord = pickNextWord(wordList, []);
+    setGame(nextWord ? newGame(nextWord) : null);
   };
 
-  const clearWordCache = () => {
-    localStorage.removeItem("words");
-  };
-
-  const updateWordInMemory = (data: WordData[] | null = null, word: WordData) => {
-    if (!data) {
-      data = wordsList;
-    }
-    const newWordsList = [...data.filter((wordObj) => wordObj.word != word.word), word];
-    localStorage.setItem("words", JSON.stringify(newWordsList));
-    setWordsList(() => newWordsList);
-  };
-
+  // Load the static word list once, then resume a saved game or start a new one.
   useEffect(() => {
-    const words = localStorage.getItem("words");
-    if (words) {
-      const data = JSON.parse(words) as WordData[];
-      setWordsList(() => data);
-      getNewWord(data);
-    } else {
-      fetch("/words.json")
-        .then((response) => response.json())
-        .then((data) => {
-          setWordsList(() => data as WordData[]);
-          localStorage.setItem("words", JSON.stringify(data));
-          getNewWord(data as WordData[]);
-        })
-        .catch((error) => console.error("Error loading JSON:", error));
-    }
+    clearLegacyState();
+    const restored = loadSession();
+    fetch("/words.json")
+      .then((response) => response.json())
+      .then((data: unknown) => {
+        if (!Array.isArray(data)) throw new Error("Malformed word list");
+        const words = data as string[];
+        setWordList(words);
+        setPlayedWords(restored.playedWords);
+        if (restored.current) {
+          setGame(restored.current);
+        } else {
+          const nextWord = pickNextWord(
+            words,
+            restored.playedWords.map((entry) => entry.word),
+          );
+          setGame(nextWord ? newGame(nextWord) : null);
+        }
+      })
+      .catch(() => {
+        notifyWordInvalid("Could not load the word list. Please refresh the page.");
+      });
   }, []);
+
+  // Persist the session as it changes. Guarded on a loaded list so a failed fetch
+  // (empty list) never clobbers the saved session.
+  useEffect(() => {
+    if (wordList.length === 0) return;
+    saveSession({ version: SESSION_VERSION, playedWords, current: game });
+  }, [game, playedWords, wordList.length]);
 
   return (
     <div className="bg-accent flex h-screen w-screen items-center justify-center overflow-auto p-2 text-center sm:p-5">
@@ -188,31 +167,43 @@ function App() {
         <div className="flex w-full">
           <BoardWrapper>
             <h1 className="mb-2 text-4xl text-white">Word Game</h1>
-            <section aria-label="Guesses">
-              <GameBoard
-                currentRowIdx={currentRow}
-                currentGuess={currentGuess}
-                currentWord={currentWord}
-                resetGuess={resetGuess}
-                endTheGame={endTheGame}
-              />
-            </section>
-            <section aria-label="Keyboard Input">
-              <VirtualKeyboard
-                enterGuess={enterGuess}
-                enterLetter={enterLetter}
-                deleteLetter={deleteLetter}
-                notify={notifyWordInvalid}
-                currentWord={currentWord}
-              />
-            </section>
-            <section aria-label="Guess Information">
-              <GuessesView
-                currentGuess={currentGuess}
-                currentWord={currentWord}
-                guessWord={currentGuessWord}
-              />
-            </section>
+            {game ? (
+              <>
+                <section aria-label="Guesses">
+                  <GameBoard
+                    currentRowIdx={game.currentRow}
+                    currentGuess={currentGuess}
+                    currentWord={game}
+                    resetGuess={resetGuess}
+                    endTheGame={endTheGame}
+                  />
+                </section>
+                <section aria-label="Keyboard Input">
+                  <VirtualKeyboard
+                    enterGuess={enterGuess}
+                    enterLetter={enterLetter}
+                    deleteLetter={deleteLetter}
+                    notify={notifyWordInvalid}
+                    currentWord={game}
+                  />
+                </section>
+                <section aria-label="Guess Information">
+                  <GuessesView
+                    currentGuess={currentGuess}
+                    currentWord={game}
+                    guessWord={currentGuessWord}
+                  />
+                </section>
+              </>
+            ) : (
+              <p
+                data-cy="no-game"
+                className="my-8 text-white">
+                {wordList.length === 0
+                  ? "Loading words…"
+                  : "You've played every word this session! Reset to play again."}
+              </p>
+            )}
 
             <section aria-label="Game Options">
               <div className="w-full sm:my-4 sm:flex sm:justify-between">
@@ -223,26 +214,30 @@ function App() {
                   <UserActionButton callback={setShowFinishedWords}>View Words</UserActionButton>
                 </div>
                 <div className="mb-2 w-full p-2">
-                  <UserActionButton callback={clearWordCache}>Clear Word Cache</UserActionButton>
+                  <UserActionButton callback={resetGameSession}>Reset Session</UserActionButton>
                 </div>
               </div>
             </section>
 
-            {hasFinished && <UserActionButton callback={resetGame}>Play Again</UserActionButton>}
+            {game?.isFinished && (
+              <UserActionButton callback={playAgain}>Play Again</UserActionButton>
+            )}
           </BoardWrapper>
         </div>
-        <Modal show={showEndModal}>
-          <div className="text-left text-white">
-            <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
-            <h3 className="mb-3 text-2xl">The word was {currentWord.word.toUpperCase()}</h3>
-            <p>
-              You took {currentRow} guess{currentRow > 1 ? "es" : ""}
-            </p>
-            <div className="mx-auto mt-5 flex w-full max-w-[200px] justify-center">
-              <UserActionButton callback={setShowEndModal}>Close Endgame Modal</UserActionButton>
+        {game && (
+          <Modal show={showEndModal}>
+            <div className="text-left text-white">
+              <h2 className="mb-3 text-3xl">{getGameOverText()}</h2>
+              <h3 className="mb-3 text-2xl">The word was {game.word.toUpperCase()}</h3>
+              <p>
+                You took {game.currentRow} guess{game.currentRow > 1 ? "es" : ""}
+              </p>
+              <div className="mx-auto mt-5 flex w-full max-w-[200px] justify-center">
+                <UserActionButton callback={setShowEndModal}>Close Endgame Modal</UserActionButton>
+              </div>
             </div>
-          </div>
-        </Modal>
+          </Modal>
+        )}
         <Modal show={showDirections}>
           <div className="text-left text-white">
             <h2 className="mb-3 text-3xl">Word Game Directions</h2>
@@ -270,7 +265,7 @@ function App() {
         </Modal>
         <Modal show={showFinishedWords}>
           <PastWords
-            wordsList={wordsList}
+            playedWords={playedWords}
             setShowFinishedWords={setShowFinishedWords}
           />
         </Modal>

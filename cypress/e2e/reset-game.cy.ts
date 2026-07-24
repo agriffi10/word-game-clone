@@ -2,11 +2,7 @@
 
 describe("Finishing the game.", () => {
   beforeEach(() => {
-    cy.stubWordValidation();
-    cy.intercept("GET", "/words*", { fixture: "words.json" });
-
-    cy.visit("/");
-    cy.contains("Close Directions").click();
+    cy.startGame();
   });
 
   it("Should allow a user to Win the game, and reset.", () => {

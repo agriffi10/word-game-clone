@@ -1,14 +1,7 @@
 import { LetterKeyType } from "../enums/KeyboardTypes";
 
-export type WordData = {
-  word: string;
-  isSolved: boolean;
-  guesses: string[];
-  currentWord: boolean;
-};
-
-// SPEC-002 — static word source. The word list is a flat string[] (answer pool
-// AND validation dictionary); game/session state is modelled separately below.
+// The word list is a flat string[] (answer pool AND validation dictionary);
+// game/session state is modelled separately below.
 
 export type GameState = {
   word: string; // target word for the current game

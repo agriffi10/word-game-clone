@@ -2,11 +2,7 @@
 
 describe("Guess Information Display", () => {
   beforeEach(() => {
-    cy.stubWordValidation();
-    cy.intercept("GET", "/words*", { fixture: "words.json" });
-
-    cy.visit("/");
-    cy.contains("Close Directions").click();
+    cy.startGame();
   });
 
   it("Should show current guess, and track guess after submit.", () => {
