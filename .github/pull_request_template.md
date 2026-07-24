@@ -1,29 +1,27 @@
-# Description
+## Summary
+<!-- What does this PR do? One or two sentences. -->
 
-Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
-
-Fixes # (issue)
+## Spec & plan
+- Spec: SPEC-XXX
+- [ ] Maps to the validated implementation plan for this spec (no scope creep)
+- [ ] No new Open Questions introduced — emergent issues were resolved in-session (and the spec updated if scope changed)
 
 ## Type of change
-
-Please delete options that are not relevant.
-
+<!-- Delete options that are not relevant. -->
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] This change requires a documentation update
 
-## How Has This Been Tested?
+## Changes
+<!-- Bullet list of what changed and why. -->
+-
 
-Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. Please also list any relevant details for your test configuration
+## Verification
+- [ ] Format / lint / typecheck pass locally (`npm run format`, `npm run lint`, `npm run typecheck`)
+- [ ] Tests pass (added/updated where behavior changed) — Cypress e2e (`npm run e2e`)
+- [ ] `sh scripts/spec-lint.sh` passes
 
-## Checklist
-
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] New and existing unit tests pass locally with my changes
-- [ ] Any dependent changes have been merged and published in downstream modules
+## Landing
+- [ ] Watching this PR to green — will merge as soon as CI passes
+- [ ] Will confirm `main` is green after merge (and fix immediately with a new PR if it isn't)
