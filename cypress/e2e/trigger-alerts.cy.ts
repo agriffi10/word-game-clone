@@ -1,5 +1,6 @@
 describe("Alerting on invalid guesses.", () => {
   beforeEach(() => {
+    cy.stubWordValidation();
     cy.visit("/");
     cy.contains("Close Directions").click();
   });

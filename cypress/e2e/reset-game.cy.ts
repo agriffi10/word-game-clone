@@ -2,6 +2,7 @@
 
 describe("Finishing the game.", () => {
   beforeEach(() => {
+    cy.stubWordValidation();
     cy.intercept("GET", "/words*", { fixture: "words.json" });
 
     cy.visit("/");
