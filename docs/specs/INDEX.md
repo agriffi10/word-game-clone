@@ -6,8 +6,8 @@ to status only — no prose.
 | Spec | Title | Status | Depends On |
 |------|-------|--------|------------|
 | SPEC-001 | Vitest Upgrade & Unit-Test Wiring | Draft | None |
-| SPEC-002 | De-Supabase & Static Random Word Source | Planned | None |
-| SPEC-003 | AWS-Native Hosting via OpenTofu (S3 + CloudFront) | Planned | SPEC-002 |
+| SPEC-002 | De-Supabase & Static Random Word Source | Draft | SPEC-001 |
+| SPEC-003 | AWS-Native Hosting via OpenTofu (S3 + CloudFront) | Draft | SPEC-002 |
 
 ## Arcs (build order)
 
