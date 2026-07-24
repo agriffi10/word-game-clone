@@ -16,8 +16,8 @@ Loaded every session — keep it lean. Deep docs live in `docs/` and are pulled 
 An accessible, browser-based clone of a popular six-letter word-guessing game. A player gets a fixed
 number of guesses to find the day's word; each guess is scored letter-by-letter and rendered with a
 Neobrutalism visual style. Accessibility is a first-class goal (the author is a 508 specialist), so the
-game is fully keyboard- and screen-reader-operable. It ships as a static single-page app; a Supabase
-Postgres backend holds the master word list for future server-driven play.
+game is fully keyboard- and screen-reader-operable. It ships as a static single-page app over a bundled
+word list — no backend.
 
 ## Layout
 
@@ -26,9 +26,8 @@ Postgres backend holds the master word list for future server-driven play.
 - `src/hooks/` — shared React hooks (e.g. `Toggle`).
 - `src/utils/` — pure game logic helpers (`GameHelpers`, `GameBoardHelpers`, `KeyboardHelpers`).
 - `src/typing/` — shared types (`components/`) and enums (`enums/`). Types live here, not inline in features.
-- `src/api/client/` — Supabase client wiring.
-- `public/words.json` — the 100-word list loaded into localStorage at runtime.
-- `supabase/` — DB `migrations/`, declarative `schemas/`, and `seeds/` (deployed by `.github/workflows/main.yml`).
+- `public/words.json` — the static ~11.9k-word list (answer pool + guess-validation dictionary).
+- `scripts/generate-words.mjs` — one-shot generator that produced `words.json` (provenance; seed retired).
 - `cypress/e2e/` — end-to-end tests. `docs/` — spec-driven docs. `__mocks__/` — file/style mocks.
 
 ## Tech Stack
@@ -39,11 +38,11 @@ Postgres backend holds the master word list for future server-driven play.
 | UI | React 18.3 (function components + Hooks) |
 | Build/dev | Vite 8 |
 | Styling | Tailwind CSS 4 (via `@tailwindcss/vite`) |
-| Backend | Supabase (`@supabase/supabase-js` 2), Postgres |
+| Backend | None — static SPA over a bundled word list |
 | UI libs | `react-toastify` (alerts), `react-focus-lock` (modal focus trap) |
 | Tests | Vitest 4 (unit — jsdom + Testing Library, istanbul coverage) via `npm test`; Cypress 13 (e2e) |
 | Lint/format | ESLint 9 (flat config, `typescript-eslint`), Prettier 3 (+ tailwind plugin) |
-| Hosting | Netlify (frontend); GitHub Actions deploys Supabase on push to `main` |
+| Hosting | Netlify (frontend) |
 
 **Don't add dependencies without noting them here first.**
 
@@ -81,21 +80,21 @@ sh scripts/spec-lint.sh
 ## Specs
 
 Index + status: `@docs/specs/INDEX.md`. Each spec file's header carries its own `Status`.
-**Current work:** none — SPEC-001 (Vitest 4 + Vite 8) completed; SPEC-002 is next in the arc.
+**Current work:** none — SPEC-002 (de-Supabase + static word source) completed; SPEC-003 (AWS hosting) is next.
 
 ---
 
 ## Key Decisions (settled — don't re-litigate; detail in the linked spec/architecture)
 
 - **Cypress e2e + Vitest 4 unit tests** — e2e covers integration-heavy flows; Vitest 4 (wired in SPEC-001) covers pure logic in `src/utils`. See `@docs/spec-delivery/SPEC-001-vitest-upgrade-and-wiring.md`.
-- **Words loaded from `public/words.json` into localStorage** at runtime; Supabase `all_words` table is the migration path, not yet the live source. See `@docs/architecture.md`.
+- **Static word source, no backend** — `public/words.json` (~11.9k words) is both the answer pool and the validation dictionary; endless random play with a resumable `localStorage` session. Supabase removed in SPEC-002. See `@docs/spec-delivery/SPEC-002-de-supabase-static-word-source.md`.
 - **Neobrutalism + accessibility-first** as the product's defining visual/UX stance. See Project Overview.
 
 ## Out of Scope (don't build)
 
-The README sketches a full-stack future (user accounts/auth, per-user stats, blob-storage guess history,
-date-picker for past words, reading the live word from Supabase). **None of that is built or in scope**
-unless a spec explicitly calls for it — today the game is a static SPA over a local word list.
+The README sketches a full-stack future (user accounts/auth, per-user stats, cross-device guess history,
+date-picker for past words). **None of that is built or in scope** unless a spec explicitly calls for it —
+today the game is a static SPA over a local word list, with no backend.
 
 ---
 

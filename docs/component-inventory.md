@@ -6,4 +6,5 @@ index to find it. Add a row as part of the completion ritual when a spec ships s
 
 | Name | Path | Purpose |
 |------|------|---------|
-| _(example)_ | `src/...` | _what it does in one line_ |
+| WordSelection | `src/utils/WordSelection.ts` | Build a validation `Set`, validate guesses, and pick a random word excluding those already played. |
+| SessionStorage | `src/utils/SessionStorage.ts` | Versioned `localStorage` load/save/reset for the game + played-words session (`wgc.session.v1`). |

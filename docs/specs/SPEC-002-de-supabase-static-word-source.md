@@ -1,7 +1,7 @@
 # Spec: De-Supabase & Static Random Word Source
 
 **ID:** SPEC-002  
-**Status:** Draft  
+**Status:** Completed  
 **Last Updated:** 2026-07-24  
 **Depends On:** SPEC-001 (unit-test harness)
 

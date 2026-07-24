@@ -157,7 +157,10 @@ list project-specific; seed it the first time a trap bites and never again.
   environment — running it from the repo root vs. the package dir changes behavior.
 - _(example)_ Config/env values the app reads at runtime must also be wired into the deploy/build
   environment, or production ships them undefined.
-- _(add your own as they bite — one line each, with the fix.)_
+- **Changing a dependency:** regenerate the lockfile cleanly (`rm -rf node_modules package-lock.json &&
+  npm install`), not with a partial `npm install`. A partial update can prune cross-platform *optional*
+  deps (e.g. `@emnapi/*` wasm transitives), so `npm ci` passes on macOS but fails on the Linux CI runner
+  with "Missing … from lock file". (Bit in SPEC-002.)
 
 ---
 

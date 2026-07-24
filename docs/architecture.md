@@ -21,15 +21,17 @@ history. Those are sketched in §5 as the intended full-stack direction but are 
 
 ## 2. Runtime data flow (current implementation)
 
-- On first load the app fetches `public/words.json` (100 six-letter words with their game properties)
-  and writes it to `localStorage`. Subsequent loads read the stringified JSON from `localStorage`
-  rather than re-fetching.
-- The word list lives in React state. Submitting a guess updates state and mirrors it back to
-  `localStorage`, giving persistence without a live database.
-- A submitted guess is validated against the current in-memory word list; an invalid (unknown) word
-  raises a `react-toastify` alert instead of being scored.
-- "Past words" reads completed entries from the same cached list; "reset" clears the word cache for a
-  clean slate.
+- On load the app fetches `public/words.json` once — a flat array of ~11.9k lowercase six-letter words
+  that is **both** the answer pool **and** the guess-validation dictionary — and builds an in-memory
+  `Set` for O(1) validation (`src/utils/WordSelection.ts`).
+- A submitted guess is validated locally (`isValidGuess`: six letters + in the set); an unknown word
+  raises a `react-toastify` alert instead of being scored. No network request is involved.
+- Each round's target is a uniformly random word not yet played this session (`pickNextWord`); the game
+  is endless — "Play Again" picks another unplayed word.
+- Session state (the in-progress `GameState` + the list of played words) is persisted to `localStorage`
+  under a versioned key (`wgc.session.v1`, `src/utils/SessionStorage.ts`) and restored on reload, so a
+  game resumes where it left off. "Past Words" lists this session's played words; "Reset Session" clears
+  the stored session and starts fresh.
 
 ## 3. Module boundaries
 
@@ -38,24 +40,21 @@ history. Those are sketched in §5 as the intended full-stack direction but are 
 - **`src/features/`** are composed screens (`game-board`, `guesses-view`, `past-words`,
   `virtual-keyboard`); **`src/components/`** are reusable primitives they compose from.
 - **`src/typing/`** is the single source of shared types and enums; features/components import from here.
-- **`src/api/client/SupabaseClient.ts`** isolates Supabase wiring so the rest of the app doesn't depend
-  on the backend directly.
 
-## 4. Word data & Supabase
+## 4. Word data (static)
 
-The master word list is modelled in Supabase Postgres (`supabase/schemas/all_words.sql`, migrations under
-`supabase/migrations/`, seeded from `supabase/seeds/six_letter_words.sql`, with RLS applied). GitHub
-Actions (`.github/workflows/main.yml`) links the project and runs `supabase db push --include-seed` on
-every push to `main`. The **frontend does not yet read from this table** — it still loads
-`public/words.json`. The table is the seam for moving word selection/validation server-side (§5).
+There is **no backend**. A single static asset, `public/words.json` (~11.9k lowercase six-letter words),
+is the answer pool and the validation dictionary. It was generated once from the retired Supabase seed by
+`scripts/generate-words.mjs` (kept as provenance); the generator's seed input was removed with the rest of
+Supabase, so the committed `words.json` is the source of truth — regenerating would need the seed from git
+history. Word delivery is a fetched `/words.json`, chosen so the SPEC-003 hosting migration needs no app
+change.
 
-## 5. Intended full-stack direction (NOT built — see CLAUDE.md → Out of Scope)
+## 5. Reserved future direction (NOT built — see CLAUDE.md → Out of Scope)
 
-The README documents a target where: the word for a day is fetched from Supabase instead of a bundled
-JSON; guess validation is a DB lookup; optional accounts unlock stats and multiple words per day; and
-per-user state (`stats`, per-word guess history) lives in blob storage at `user-data/{username}/…`,
-with logged-out users falling back to a localStorage shape that mirrors the current-day word only. This
-is the reserved design, not a commitment — any of it must come in through a spec before it is built.
+A future full-stack version could add accounts/auth, per-user stats, cross-device sync, and a
+global-daily-word mode. None of that exists today, and there is no backend seam left in the code — any of
+it would require introducing a backend and must come in through a spec before it is built.
 
 ---
 
@@ -66,17 +65,17 @@ first time they bite.
 
 - **Two test layers; only unit tests gate CI.** Vitest 4 (`npm test` — jsdom + Testing Library, istanbul;
   setup `src/setupTests.ts`, `test` block in `vite.config.ts`) runs in CI and gates every PR. Cypress e2e
-  (`npm run e2e`) is **not** in CI: it runs locally against the dev server on `:3000` and needs a local
-  `.env` with valid-format `VITE_SUPABASE_*` (the Supabase client throws at load without them). Guess
-  validation hits Supabase `all_words`, so the specs stub it via `cy.stubWordValidation()`. (Vitest wired
-  in SPEC-001.)
-- **No live backend read.** The word list is bundled (`public/words.json`) and cached in `localStorage`;
-  the Supabase table exists but is not the runtime source (§4). Word data changes must update *both*
-  until the frontend is migrated.
-- **`localStorage` is the only persistence.** State survives reloads but is per-browser and clearable by
-  the user via the reset action — no cross-device continuity.
+  (`npm run e2e`) is **not** in CI: it runs locally against the dev server on `:3000`. Specs control the
+  word list by intercepting `/words.json` with a fixture and make selection deterministic by stubbing
+  `Math.random` (`cy.startGame()`). (Vitest wired in SPEC-001.)
+- **jsdom has no working `localStorage`** in this setup — `src/setupTests.ts` installs an in-memory
+  polyfill so session-persistence unit tests run.
+- **No backend — fully static.** The word list is a bundled asset (`public/words.json`, §4); validation
+  and selection are entirely client-side. There is nothing to keep in sync server-side.
+- **`localStorage` is the only persistence** (`wgc.session.v1`). State survives reloads but is
+  per-browser and clearable via Reset Session — no cross-device continuity.
 
 ## Deferred / Non-goals
 
-- User accounts / auth, per-user stats, blob-storage guess history, and date-selectable past words —
-  reserved in §5, seam is the Supabase `all_words` table and `SupabaseClient`.
+- User accounts / auth, per-user stats, cross-device sync, and a global-daily-word mode — reserved in §5;
+  no code seam exists, so each would need a new backend introduced via a spec.
