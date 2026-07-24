@@ -1,7 +1,7 @@
 # Spec: Vitest v4 & Vite 8 Upgrade + Unit-Test Wiring
 
 **ID:** SPEC-001  
-**Status:** In Progress  
+**Status:** Completed  
 **Last Updated:** 2026-07-24  
 **Depends On:** None
 
