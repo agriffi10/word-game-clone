@@ -1,7 +1,7 @@
-# Spec: Vitest Upgrade & Unit-Test Wiring
+# Spec: Vitest v4 & Vite 8 Upgrade + Unit-Test Wiring
 
 **ID:** SPEC-001  
-**Status:** Draft  
+**Status:** In Progress  
 **Last Updated:** 2026-07-24  
 **Depends On:** None
 
@@ -14,11 +14,17 @@ no `test` script, no `test` block in `vite.config.ts`, and `tsconfig.json` still
 This spec brings Vitest to the current major version and wires it up so unit tests execute reliably —
 locally and in CI — giving later specs (the Supabase removal and the random word-selection logic) a
 working test harness to build on. It is deliberately tooling-only: no game behavior changes here.
+Because the work already sits in the build-tooling layer, it also brings Vite current — from the v6 to
+the v8 line, along with its React and Tailwind plugins — so the whole toolchain is modern before
+SPEC-002/003 build on it. (Vitest v4 supports Vite 6, so the Vite jump is a chosen modernization, not a
+forced one.)
 
 ## Scope
 
 ### In Scope
 
+- Upgrade the Vite build toolchain from the v6 to the current v8 line, bumping `@vitejs/plugin-react`
+  and `@tailwindcss/vite` to Vite-8-compatible versions, keeping the app building and the e2e suite green.
 - Upgrade `vitest` and `@vitest/coverage-istanbul` from v3 to the current v4 line.
 - Reconcile the co-installed test helpers (`vitest-axe`, `vitest-canvas-mock`, `vitest-fetch-mock`,
   `vitest-sonar-reporter`, `jsdom`, `@testing-library/*`) with Vitest v4 — upgrade each to a compatible
@@ -125,6 +131,21 @@ The CI `node` job runs the unit suite so a failing test blocks merge.
       `sh scripts/spec-lint.sh` — all exit 0.
 - [ ] The existing `npm run build` and Cypress `npm run e2e` commands still succeed (no regression).
 
+### FR-007: Vite build toolchain upgraded to the current major
+
+#### Description:
+
+Vite and its React/Tailwind plugins are upgraded from the v6 line to the current v8 line, and the app
+still builds and runs. (Delivered first, so the Vitest wiring lands on the modern toolchain.)
+
+#### Acceptance Criteria:
+
+- [ ] `package.json` lists `vite` at `^8.x` and `@vitejs/plugin-react` at a Vite-8-compatible version.
+- [ ] `@tailwindcss/vite` resolves to a version whose peer range includes Vite 8.
+- [ ] `npm ci` completes with exit 0 and no ERESOLVE / unmet-peer errors.
+- [ ] `npm run build` (`tsc && vite build`) exits 0.
+- [ ] `npm run e2e` (Cypress) passes against the Vite-8 build — no regression.
+
 ---
 
 ## Interface Contract
@@ -168,16 +189,25 @@ package.json                       # + test scripts, upgraded vitest deps
 
 ## Implementation Phases
 
-### Phase 1: Upgrade & configure
+### Phase 1: Vite build-toolchain upgrade (v6 → v8)
+
+- Bump `vite` to `^8.x`, `@vitejs/plugin-react` to its Vite-8-compatible major, and `@tailwindcss/vite`
+  to a version whose peer range includes Vite 8.
+- Regenerate and commit `package-lock.json`.
+- Confirm `npm run typecheck`, `npm run lint`, `npm run format`, `npm run build`, and Cypress
+  `npm run e2e` all stay green on the new toolchain.
+- Land this isolated from the Vitest work so a build/e2e regression is bisectable to the Vite jump.
+
+### Phase 2: Vitest upgrade & configure
 
 - Bump `vitest` + `@vitest/coverage-istanbul` to `^4.x`; reconcile the helper libs (upgrade compatible
-  versions; remove any unused lib that blocks v4).
+  versions; remove any unused lib rather than dragging it through the major bump).
 - Add the `test` block to `vite.config.ts`.
 - Add the `test`, `test:watch`, `test:coverage` scripts.
 - Resolve the `jest-setup.ts` reference and settle on one setup file.
 - Confirm `npm run typecheck`, `npm run lint`, `npm run format`, and `npm run build` all stay green.
 
-### Phase 2: First suite + CI wiring
+### Phase 3: First suite + CI wiring
 
 - Write `src/utils/GameHelpers.test.ts` covering all four `determineLetterStyle` branches.
 - Add `npm test` to the CI `node` job.
