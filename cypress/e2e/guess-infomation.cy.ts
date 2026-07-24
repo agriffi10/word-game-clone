@@ -2,6 +2,7 @@
 
 describe("Guess Information Display", () => {
   beforeEach(() => {
+    cy.stubWordValidation();
     cy.intercept("GET", "/words*", { fixture: "words.json" });
 
     cy.visit("/");

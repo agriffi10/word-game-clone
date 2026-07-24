@@ -67,8 +67,9 @@ first time they bite.
 - **Two test layers; only unit tests gate CI.** Vitest 4 (`npm test` — jsdom + Testing Library, istanbul;
   setup `src/setupTests.ts`, `test` block in `vite.config.ts`) runs in CI and gates every PR. Cypress e2e
   (`npm run e2e`) is **not** in CI: it runs locally against the dev server on `:3000` and needs a local
-  `.env` (the Supabase client throws without `VITE_SUPABASE_*`); the suite currently has pre-existing
-  failures unrelated to tooling. (Vitest wired in SPEC-001.)
+  `.env` with valid-format `VITE_SUPABASE_*` (the Supabase client throws at load without them). Guess
+  validation hits Supabase `all_words`, so the specs stub it via `cy.stubWordValidation()`. (Vitest wired
+  in SPEC-001.)
 - **No live backend read.** The word list is bundled (`public/words.json`) and cached in `localStorage`;
   the Supabase table exists but is not the runtime source (§4). Word data changes must update *both*
   until the frontend is migrated.

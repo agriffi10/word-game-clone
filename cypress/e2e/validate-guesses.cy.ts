@@ -2,6 +2,7 @@
 
 describe("Enter guesses on the board.", () => {
   beforeEach(() => {
+    cy.stubWordValidation();
     cy.visit("/");
     cy.contains("Close Directions").click();
   });

@@ -40,9 +40,30 @@ declare global {
       getKeyboardLetter(letter: string): Chainable<JQuery<HTMLElement>>;
       enterWord(guess: string): void;
       getToastAlert(selector: string): Chainable<JQuery<HTMLElement>>;
+      /**
+       * Stub the Supabase guess-validation lookup so guess submission works
+       * without a live backend. Call in a spec's `beforeEach` before visiting.
+       */
+      stubWordValidation(): void;
     }
   }
 }
+
+// Guesses the tests submit that should validate as real words. The app checks
+// each guess against the Supabase `all_words` table, which is unreachable in
+// e2e (dummy creds) — so we stub it: a real word returns one row, anything else
+// (e.g. "qwerty", "qqqqqq") returns none, which the app surfaces as invalid.
+const VALID_WORDS = [
+  "banana",
+  "puzzle",
+  "marble",
+  "orange",
+  "guitar",
+  "breeze",
+  "silent",
+  "saddle",
+  "museum",
+];
 
 Cypress.Commands.add("getBySel", (selector) => {
   return cy.get(`[data-cy=${selector}]`);
@@ -62,4 +83,14 @@ Cypress.Commands.add("enterWord", (guess) => {
 
 Cypress.Commands.add("getToastAlert", (selector) => {
   return cy.get(`[aria-label="${selector}"]`);
+});
+
+// Intercept GET {SUPABASE_URL}/rest/v1/all_words?word=eq.<word>&... and answer
+// from VALID_WORDS, mirroring the real ".eq('word', guess').limit(1)" lookup.
+Cypress.Commands.add("stubWordValidation", () => {
+  cy.intercept("GET", "**/rest/v1/all_words*", (req) => {
+    const word = new URL(req.url).searchParams.get("word")?.replace(/^eq\./, "").toLowerCase();
+    const isValid = !!word && VALID_WORDS.includes(word);
+    req.reply(isValid ? [{ word }] : []);
+  }).as("validateWord");
 });
