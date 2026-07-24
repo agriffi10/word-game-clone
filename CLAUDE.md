@@ -37,11 +37,11 @@ Postgres backend holds the master word list for future server-driven play.
 |---|---|
 | Language | TypeScript ~5.6 (strict) |
 | UI | React 18.3 (function components + Hooks) |
-| Build/dev | Vite 6 |
+| Build/dev | Vite 8 |
 | Styling | Tailwind CSS 4 (via `@tailwindcss/vite`) |
 | Backend | Supabase (`@supabase/supabase-js` 2), Postgres |
 | UI libs | `react-toastify` (alerts), `react-focus-lock` (modal focus trap) |
-| Tests | Cypress 13 (e2e). Vitest is installed but **not wired** — see `@docs/architecture.md` Known Constraints |
+| Tests | Vitest 4 (unit — jsdom + Testing Library, istanbul coverage) via `npm test`; Cypress 13 (e2e) |
 | Lint/format | ESLint 9 (flat config, `typescript-eslint`), Prettier 3 (+ tailwind plugin) |
 | Hosting | Netlify (frontend); GitHub Actions deploys Supabase on push to `main` |
 
@@ -65,6 +65,9 @@ npm run dev            # Vite dev server on :3000
 npm run build          # tsc && vite build
 npm run preview        # preview production build on :3001
 # test
+npm test               # vitest run (headless unit tests)
+npm run test:watch     # vitest (watch mode)
+npm run test:coverage  # vitest run --coverage (istanbul)
 npm run e2e            # cypress run (headless e2e)
 npm run cypress        # cypress open (interactive)
 # lint / format / typecheck
@@ -78,13 +81,13 @@ sh scripts/spec-lint.sh
 ## Specs
 
 Index + status: `@docs/specs/INDEX.md`. Each spec file's header carries its own `Status`.
-**Current work:** none — spec-driven scaffolding just adopted; next work unplanned.
+**Current work:** none — SPEC-001 (Vitest 4 + Vite 8) completed; SPEC-002 is next in the arc.
 
 ---
 
 ## Key Decisions (settled — don't re-litigate; detail in the linked spec/architecture)
 
-- **Cypress e2e over unit tests** — chosen for this integration-heavy game; Vitest deps exist but are unconfigured. See `@docs/architecture.md` Known Constraints.
+- **Cypress e2e + Vitest 4 unit tests** — e2e covers integration-heavy flows; Vitest 4 (wired in SPEC-001) covers pure logic in `src/utils`. See `@docs/spec-delivery/SPEC-001-vitest-upgrade-and-wiring.md`.
 - **Words loaded from `public/words.json` into localStorage** at runtime; Supabase `all_words` table is the migration path, not yet the live source. See `@docs/architecture.md`.
 - **Neobrutalism + accessibility-first** as the product's defining visual/UX stance. See Project Overview.
 

@@ -64,11 +64,11 @@ is the reserved design, not a commitment — any of it must come in through a sp
 Hard constraints and non-obvious gotchas that shape every spec. New constraints get added here the
 first time they bite.
 
-- **Test tooling is inconsistent.** Cypress e2e is the real, wired test suite (`npm run e2e`). Vitest and
-  Testing Library are installed as devDependencies but there is **no `test` script, no `test` block in
-  `vite.config.ts`, and no `jest-setup.ts`** (though `tsconfig.json` `include` still lists one). Don't
-  assume `npm test` exists. Wiring Vitest for unit tests is a deliberate, spec-worthy task, not a
-  drive-by change.
+- **Two test layers; only unit tests gate CI.** Vitest 4 (`npm test` — jsdom + Testing Library, istanbul;
+  setup `src/setupTests.ts`, `test` block in `vite.config.ts`) runs in CI and gates every PR. Cypress e2e
+  (`npm run e2e`) is **not** in CI: it runs locally against the dev server on `:3000` and needs a local
+  `.env` (the Supabase client throws without `VITE_SUPABASE_*`); the suite currently has pre-existing
+  failures unrelated to tooling. (Vitest wired in SPEC-001.)
 - **No live backend read.** The word list is bundled (`public/words.json`) and cached in `localStorage`;
   the Supabase table exists but is not the runtime source (§4). Word data changes must update *both*
   until the frontend is migrated.
@@ -79,4 +79,3 @@ first time they bite.
 
 - User accounts / auth, per-user stats, blob-storage guess history, and date-selectable past words —
   reserved in §5, seam is the Supabase `all_words` table and `SupabaseClient`.
-- Vitest unit-test harness — infrastructure is installed but unconfigured (see Known Constraints).

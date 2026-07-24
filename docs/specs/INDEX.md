@@ -5,7 +5,7 @@ to status only — no prose.
 
 | Spec | Title | Status | Depends On |
 |------|-------|--------|------------|
-| SPEC-001 | Vitest v4 & Vite 8 Upgrade + Unit-Test Wiring | In Progress | None |
+| SPEC-001 | Vitest v4 & Vite 8 Upgrade + Unit-Test Wiring | Completed | None |
 | SPEC-002 | De-Supabase & Static Random Word Source | Draft | SPEC-001 |
 | SPEC-003 | AWS-Native Hosting via OpenTofu (S3 + CloudFront) | Draft | SPEC-002 |
 
